@@ -1,2 +1,13 @@
-# PC-Practicas
-Pequeñas prácticas para la asignatura de Programación Concurrente (PC) del grado en Ingeniería Informática de la Universidad Complutense de Madrid (UCM). — Small projects for Concurrent Programming (PC) course of Computer Science Engineering Bachelor Program at Universidad Complutense de Madrid (UCM).
+# Prácticas de Programación Concurrente (PC)
+
+En este repositorio se encuentran mis soluciones para las prácticas de la asignatura de Programación Concurrente (PC) del grado en Ingeniería Informática de la UCM (itinerario de Computación).
+
+PC es una asignatura de tercer curso, impartida solamente a los que cursan el itinerario de Computación. En ella, se enseñan los fundamentos de la programación concurrente explicando los conceptos teóricos, viendo ejemplos en pseudocódigo, e implementando soluciones a problemas en Java.
+
+A lo largo de la asignatura, se realizan en total 5 prácticas. Las 4 primeras no se entregan, simplemente sirven para practicar la implementación de programas concurrentes en Java, y para sentar las bases para la última práctica, que es la final y que tiene un peso de un 20 % en la nota de la asignatura.
+
+## Prácticas
+
+Enlaces a los directorios de las prácticas, que contienen el enunciado y el código fuente de cada ejercicio:
+
+- [Práctica 1: Introducción a la concurrencia](/Práctica%201)
