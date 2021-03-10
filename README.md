@@ -6,9 +6,9 @@ PC es una asignatura de tercer curso, impartida solamente a los que cursan el it
 
 A lo largo de la asignatura, se realizan en total 5 prácticas. Las 4 primeras no se entregan, simplemente sirven para practicar la implementación de programas concurrentes en Java, y para sentar las bases para la última práctica, que es la final y que tiene un peso de un 20 % en la nota de la asignatura.
 
-## Prácticas
+Cada práctica tiene su propio directorio, que contiene el enunciado y el código fuente de cada ejercicio.
 
-Enlaces a los directorios de las prácticas, que contienen el enunciado y el código fuente de cada ejercicio:
+## Prácticas
 
 - [Práctica 1: Introducción a la concurrencia](/Práctica%201)
 - [Práctica 2: El problema de la sección crítica](/Práctica%202)
