@@ -11,3 +11,4 @@ A lo largo de la asignatura, se realizan en total 5 prácticas. Las 4 primeras n
 Enlaces a los directorios de las prácticas, que contienen el enunciado y el código fuente de cada ejercicio:
 
 - [Práctica 1: Introducción a la concurrencia](/Práctica%201)
+- [Práctica 2: El problema de la sección crítica](/Práctica%202)
