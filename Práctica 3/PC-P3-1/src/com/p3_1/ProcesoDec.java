@@ -1,14 +1,14 @@
-package com.p3_3;
+package com.p3_1;
 
 import java.util.concurrent.Semaphore;
 
-public class ProcesoInc extends Thread {
+public class ProcesoDec extends Thread {
 
     private A _a;
     private Semaphore _mutex;
     private int _n;
 
-    ProcesoInc(A a, Semaphore mutex, int n) {
+    ProcesoDec(A a, Semaphore mutex, int n) {
 
         _a = a;
         _mutex = mutex;
@@ -26,7 +26,7 @@ public class ProcesoInc extends Thread {
                 e.printStackTrace();
             }
 
-            _a.incrementarN();
+            _a.decrementarN();
 
             _mutex.release();
 
