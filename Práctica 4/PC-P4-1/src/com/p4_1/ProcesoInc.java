@@ -4,7 +4,7 @@ public class ProcesoInc extends Thread {
 
     public static final int N = 1000;
 
-    private A _a;
+    private final A _a;
 
     ProcesoInc(A a) {
 

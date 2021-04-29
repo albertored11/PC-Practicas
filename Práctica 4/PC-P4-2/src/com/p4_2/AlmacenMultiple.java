@@ -4,8 +4,8 @@ import java.util.LinkedList;
 
 public class AlmacenMultiple implements Almacen {
 
-    private int _capacidad;
-    private LinkedList<Producto> _colaProductos;
+    private final int _capacidad;
+    private final LinkedList<Producto> _colaProductos;
 
     AlmacenMultiple(int capacidad) {
 
@@ -20,7 +20,7 @@ public class AlmacenMultiple implements Almacen {
         while (_colaProductos.size() == _capacidad) {
             try {
                 wait();
-            } catch (InterruptedException e) {
+            } catch (InterruptedException ignored) {
             }
         }
 
@@ -38,7 +38,7 @@ public class AlmacenMultiple implements Almacen {
         while (_colaProductos.isEmpty()) {
             try {
                 wait();
-            } catch (InterruptedException e) {
+            } catch (InterruptedException ignored) {
             }
         }
 

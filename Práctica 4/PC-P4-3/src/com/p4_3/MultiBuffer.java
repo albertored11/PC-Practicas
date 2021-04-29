@@ -3,12 +3,12 @@ package com.p4_3;
 import java.util.LinkedList;
 import java.util.List;
 
-public class AlmacenMultiple implements Almacen {
+public class MultiBuffer implements Almacen {
 
-    private int _capacidad;
-    private LinkedList<Producto> _colaProductos;
+    private final int _capacidad;
+    private final LinkedList<Producto> _colaProductos;
 
-    AlmacenMultiple(int capacidad) {
+    MultiBuffer(int capacidad) {
 
         _capacidad = capacidad;
         _colaProductos = new LinkedList<>();
@@ -23,7 +23,7 @@ public class AlmacenMultiple implements Almacen {
             while (_colaProductos.size() == _capacidad) {
                 try {
                     wait();
-                } catch (InterruptedException e) {
+                } catch (InterruptedException ignored) {
                 }
             }
 
@@ -45,7 +45,7 @@ public class AlmacenMultiple implements Almacen {
             while (_colaProductos.isEmpty()) {
                 try {
                     wait();
-                } catch (InterruptedException e) {
+                } catch (InterruptedException ignored) {
                 }
             }
 

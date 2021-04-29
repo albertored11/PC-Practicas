@@ -2,8 +2,8 @@ package com.p4_2;
 
 public class Consumidor extends Thread {
 
-    private int _n;
-    private Almacen _almacen;
+    private final int _n;
+    private final Almacen _almacen;
 
     Consumidor(int n, Almacen almacen) {
 

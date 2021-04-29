@@ -2,9 +2,9 @@ package com.p4_2;
 
 public class Productor extends Thread {
 
-    private int _id;
-    private int _n;
-    private Almacen _almacen;
+    private final int _id;
+    private final int _n;
+    private final Almacen _almacen;
 
     Productor(int id, int n, Almacen almacen) {
 

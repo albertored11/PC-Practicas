@@ -2,7 +2,7 @@ package com.p4_3;
 
 public class Producto {
 
-    private Integer _id;
+    private final Integer _id;
 
     Producto(int id) {
 
