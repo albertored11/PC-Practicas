@@ -13,3 +13,4 @@ Cada práctica tiene su propio directorio, que contiene el enunciado y el códig
 - [Práctica 1: Introducción a la concurrencia](/Práctica%201)
 - [Práctica 2: El problema de la sección crítica](/Práctica%202)
 - [Práctica 3: Uso de semáforos](/Práctica%203)
+- [Práctica 4: Monitores](/Práctica%204)
