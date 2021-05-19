@@ -7,27 +7,35 @@ import java.util.Scanner;
 
 public class Servidor {
 
-    public static void main(String[] args) throws IOException {
+    public static void main(String[] args) {
 
         Scanner in = new Scanner(System.in);
-        int port;
-        ServerSocket servSock;
 
         System.out.print("Port: ");
-        port = in.nextInt();
+        int port = in.nextInt();
 
-        servSock = new ServerSocket(port);
+        try {
 
-        while (true) {
+            ServerSocket servSock = new ServerSocket(port);
 
-            System.out.println("Waiting for clients...");
+            while (true) {
 
-            Socket sock = servSock.accept();
+                System.out.println("Waiting for clients...");
 
-            System.out.println("Client connected from " + sock.getInetAddress());
+                Socket sock = servSock.accept();
 
-            (new OyenteCliente(sock)).start();
+                System.out.println("Client connected from " + sock.getInetAddress().toString().substring(1));
 
+                OutputStream outStr = sock.getOutputStream();
+                InputStream inStr = sock.getInputStream();
+
+                (new OyenteCliente(outStr, inStr)).start();
+
+            }
+
+        }
+        catch (IOException e) {
+            System.err.println("ERROR: IO exception");
         }
 
     }

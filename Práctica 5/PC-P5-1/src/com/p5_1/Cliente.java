@@ -4,52 +4,58 @@ import java.io.*;
 import java.net.Socket;
 import java.util.Scanner;
 
+import static java.lang.System.exit;
+
 public class Cliente {
 
-    public static void main(String[] args) throws IOException {
+    public static void main(String[] args) {
 
         Scanner in = new Scanner(System.in);
-        String hostname, filepath;
-        int port;
-        Socket sock;
-        InputStream inStr;
-        OutputStream outStr;
-        PrintWriter writer;
-        BufferedReader reader;
-        String text;
 
         System.out.print("Hostname: ");
-        hostname = in.nextLine();
+        String hostname = in.nextLine();
 
         System.out.print("Port: ");
-        port = in.nextInt();
+        int port = in.nextInt();
         in.nextLine(); // consume \n from int
 
-        sock = new Socket(hostname, port);
+        try {
 
-        inStr = sock.getInputStream();
-        outStr = sock.getOutputStream();
+            Socket sock = new Socket(hostname, port);
 
-        System.out.print("Path to file: ");
-        filepath = in.nextLine();
+            OutputStream outStr = sock.getOutputStream();
+            InputStream inStr = sock.getInputStream();
 
-        writer = new PrintWriter(outStr, true);
+            System.out.print("Path to file: ");
+            String filepath = in.nextLine();
 
-        writer.println(filepath);
+            PrintWriter writer = new PrintWriter(outStr, true);
+            BufferedReader reader = new BufferedReader(new InputStreamReader(inStr));
 
-        reader = new BufferedReader(new InputStreamReader(inStr));
+            writer.println(filepath);
 
-        text = reader.readLine();
+            String text = reader.readLine();
 
-        while (text != null) {
-            System.out.println(text);
-            text = reader.readLine();
+            if (text.equals("FILE_NOT_FOUND")) {
+                System.err.println("ERROR: File " + filepath + " not found");
+                exit(1);
+            }
+
+            while (text != null) {
+                System.out.println(text);
+                text = reader.readLine();
+            }
+
+            outStr.close();
+            inStr.close();
+            writer.close();
+            reader.close();
+
+        }
+        catch (IOException e) {
+            System.err.println("ERROR: IO exception");
         }
 
-        outStr.close();
-        inStr.close();
-        writer.close();
-        reader.close();
         in.close();
 
     }
