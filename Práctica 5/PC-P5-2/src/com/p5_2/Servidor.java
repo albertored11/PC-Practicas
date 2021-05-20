@@ -1,33 +1,28 @@
 package com.p5_2;
 
 import java.io.IOException;
-import java.io.InputStream;
-import java.io.ObjectOutputStream;
-import java.io.OutputStream;
 import java.net.InetAddress;
 import java.net.ServerSocket;
-import java.net.Socket;
 import java.net.UnknownHostException;
-import java.security.KeyPair;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.Scanner;
 
 import static java.lang.System.exit;
 
 public class Servidor {
 
-    private List<Stream> _userStreamList;
-    private List<List<Fichero>> _userFileList;
+    private Map<String, Stream> _userStreamMap;
+    private Map<String, List<Fichero>> _userFileMap;
     private String _inetAddress;
     private int _port;
     private ServerSocket _servSock;
 
     public Servidor(int port) {
 
-        _userStreamList = new ArrayList<>();
-        _userFileList = new ArrayList<>();
+        _userStreamMap = new HashMap<>();
+        _userFileMap = new HashMap<>();
 
         try {
             _inetAddress = InetAddress.getLocalHost().toString();
@@ -47,12 +42,12 @@ public class Servidor {
 
     }
 
-    public List<Stream> getUserStreamList() {
-        return _userStreamList;
+    public Map<String, Stream> getUserStreamMap() {
+        return _userStreamMap;
     }
 
-    public List<List<Fichero>> getUserFileList() {
-        return _userFileList;
+    public Map<String, List<Fichero>> getUserFileMap() {
+        return _userFileMap;
     }
 
     public String getInetAddress() {
@@ -67,12 +62,18 @@ public class Servidor {
         return _servSock;
     }
 
-    public void addToUserStreamList(Stream stream) {
-        _userStreamList.add(stream);
+    public void putInUserStreamMap(String username, Stream stream) {
+        _userStreamMap.put(username, stream);
     }
 
-    public void addToUserFileList(List<Fichero> fileList) {
-        _userFileList.add(fileList);
+    public void putInUserFileMap(String username, List<Fichero> fileList) {
+        _userFileMap.put(username, fileList);
+    }
+
+    public void removeFromUserLists(String username) {
+
+        _userStreamMap.remove(username);
+
     }
 
 }

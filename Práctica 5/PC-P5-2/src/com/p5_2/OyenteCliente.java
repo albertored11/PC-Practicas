@@ -32,8 +32,8 @@ public class OyenteCliente extends Thread {
 
                     MensajeConexion mc = (MensajeConexion)m;
 
-                    _server.addToUserStreamList(mc.getStream());
-                    _server.addToUserFileList(mc.getFileList());
+                    _server.putInUserStreamMap(mc.getUsername(), mc.getStream());
+                    _server.putInUserFileMap(mc.getUsername(), mc.getFileList());
 
                     Mensaje mcc = new MensajeConfirmacionConexion(mc.getDestino(), mc.getOrigen());
 
@@ -46,7 +46,7 @@ public class OyenteCliente extends Thread {
                     Mensaje mclu = new MensajeConfirmacionListaUsuarios(
                             m.getDestino(),
                             m.getOrigen(),
-                            _server.getUserFileList());
+                            _server.getUserFileMap());
 
                     objOutStr.writeObject(mclu);
 
