@@ -4,15 +4,16 @@ import java.io.Serializable;
 
 public class Fichero implements Serializable {
 
-    private String _name;
+    private String _filepath;
 
-    public Fichero(String name) {
+    public Fichero(String filepath) {
 
-        _name = name;
+        _filepath = filepath;
 
     }
 
-    public String getName() {
-        return _name;
+    public String getFilePath() {
+        return _filepath;
     }
+
 }

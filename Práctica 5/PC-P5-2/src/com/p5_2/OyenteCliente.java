@@ -19,92 +19,152 @@ public class OyenteCliente extends Thread {
     @Override
     public void run() {
 
-        ObjectInputStream objInStr = new ObjectInputStream(_inStr);
-        ObjectOutputStream objOutStr = new ObjectOutputStream(_outStr);
+        try { // TODO tratar excepciones
 
-        while (true) {
+            ObjectInputStream objInStr = new ObjectInputStream(_inStr);
+            ObjectOutputStream objOutStr = new ObjectOutputStream(_outStr);
 
-            Mensaje m = (Mensaje)objInStr.readObject();
+            Usuario user = null;
 
-            switch (m.getTipo()) {
+            while (true) {
 
-                case "MENSAJE_CONEXION":
+                System.out.println("Waiting for message...");
 
-                    MensajeConexion mc = (MensajeConexion)m;
+                Mensaje m = (Mensaje)objInStr.readObject();
 
-                    _server.putInUserStreamMap(mc.getUsername(), mc.getStream());
-                    _server.putInUserFileMap(mc.getUsername(), mc.getFileList());
+                System.out.println(m);
 
-                    Mensaje mcc = new MensajeConfirmacionConexion(mc.getDestino(), mc.getOrigen());
+                switch (m.getTipo()) {
 
-                    objOutStr.writeObject(mcc);
+                    case "MENSAJE_CONEXION":
 
-                    break;
+                        System.out.println("MENSAJE_CONEXION recibido!");
 
-                case "MENSAJE_LISTA_USUARIOS":
+                        MensajeConexion mc = (MensajeConexion)m;
+                        user = mc.getUser();
 
-                    Mensaje mclu = new MensajeConfirmacionListaUsuarios(
-                            m.getDestino(),
-                            m.getOrigen(),
-                            _server.getUserFileMap());
+                        Stream stream = new Stream(_outStr, _inStr);
 
-                    objOutStr.writeObject(mclu);
+                        _server.putInUserStreamMap(mc.getUser(), stream);
+                        _server.addToUserList(user, user.getFileList());
 
-                    break;
+                        Mensaje mcc = new MensajeConfirmacionConexion(mc.getDestino(), mc.getOrigen());
 
-                case "MENSAJE_CERRAR_CONEXION":
+                        objOutStr.writeObject(mcc);
 
+                        break;
 
+                    case "MENSAJE_LISTA_USUARIOS":
 
-                    break;
+                        Mensaje mclu = new MensajeConfirmacionListaUsuarios(
+                                m.getDestino(),
+                                m.getOrigen(),
+                                _server.getUserList());
+
+                        objOutStr.writeObject(mclu);
+
+                        break;
+
+                    case "MENSAJE_CERRAR_CONEXION":
+
+                        MensajeCerrarConexion mcco = (MensajeCerrarConexion) m;
+
+                        _server.removeFromUserLists(mcco.getUser());
+
+                        Mensaje mccc = new MensajeConfirmacionCerrarConexion(mcco.getDestino(), mcco.getOrigen());
+
+                        objOutStr.writeObject(mccc);
+
+                        break;
+
+                    case "MENSAJE_PEDIR_FICHERO":
+
+                        MensajePedirFichero mpf = (MensajePedirFichero) m;
+
+                        Fichero file = mpf.getFile();
+
+                        Usuario user1 = _server.getFileUser(file);
+
+                        ObjectOutputStream objOutStr1 = new ObjectOutputStream(_server.getOutputStream(user1));
+
+                        Mensaje mef = new MensajeEmitirFichero(mpf.getDestino(), mpf.getOrigen(), file);
+
+                        objOutStr1.writeObject(mef);
+
+                        break;
+
+                    case "MENSAJE_PREPARADO_CLIENTESERVIDOR":
+
+                        if (user == null) {
+                            System.err.println("INTERNAL ERROR: user info not found");
+                            break;
+                        }
+
+                        MensajePreparadoClienteServidor mpcs = (MensajePreparadoClienteServidor) m;
+
+                        ObjectOutputStream objOutStr2 = new ObjectOutputStream(_server.getOutputStream(mpcs.getUser()));
+
+                        Mensaje mpsc = new MensajePreparadoServidorCliente(mpcs.getDestino(), mpcs.getOrigen(), user, mpcs.getPort());
+
+                        objOutStr2.writeObject(mpsc);
+
+                        break;
+
+                    default:
+
+                        System.err.println("INTERNAL ERROR: unknown message");
+
+                        break;
+
+                }
 
             }
 
-        }
+        } catch (Exception e) {}
 
         // ...
 
-        PrintWriter writer = new PrintWriter(_outStr, true);
-        BufferedReader reader = new BufferedReader(new InputStreamReader(_inStr));
-        String filepath = null;
-
-        try {
-
-            filepath = reader.readLine();
-
-            File file = new File(filepath);
-            FileReader fileReader = new FileReader(file);
-            BufferedReader bufReader = new BufferedReader(fileReader);
-
-            System.out.println("Reading from " + filepath + "...");
-
-            StringBuilder textBuilder = new StringBuilder();
-
-            String text = bufReader.readLine();
-
-            while (text != null) {
-                textBuilder.append(text);
-                textBuilder.append('\n');
-                text = bufReader.readLine();
-            }
-
-            System.out.println("Sending text from " + filepath + "...");
-
-            writer.println(textBuilder);
-
-            _inStr.close();
-            _outStr.close();
-            bufReader.close();
-            reader.close();
-            writer.close();
-
-        } catch (FileNotFoundException e) {
-            System.err.println("ERROR: File " + filepath + " not found");
-            writer.println("FILE_NOT_FOUND");
-        }
-        catch (IOException e) {
-            System.err.println("ERROR: IO exception");
-        }
+//        PrintWriter writer = new PrintWriter(_outStr, true);
+//        BufferedReader reader = new BufferedReader(new InputStreamReader(_inStr));
+//        String filepath = null;
+//
+//        try {
+//
+//            filepath = reader.readLine();
+//
+//            File file = new File(filepath);
+//            FileReader fileReader = new FileReader(file);
+//            BufferedReader bufReader = new BufferedReader(fileReader);
+//
+//            System.out.println("Reading from " + filepath + "...");
+//
+//            StringBuilder textBuilder = new StringBuilder();
+//
+//            String text = bufReader.readLine();
+//
+//            while (text != null) {
+//                textBuilder.append(text);
+//                textBuilder.append('\n');
+//                text = bufReader.readLine();
+//            }
+//
+//            System.out.println("Sending text from " + filepath + "...");
+//
+//            writer.println(textBuilder);
+//
+//            _inStr.close();
+//            _outStr.close();
+//            bufReader.close();
+//            reader.close();
+//            writer.close();
+//
+//        } catch (FileNotFoundException e) {
+//            System.err.println("ERROR: File " + filepath + " not found");
+//            writer.println("FILE_NOT_FOUND");
+//        }
+//        catch (IOException e) {
+//            System.err.println("ERROR: IO exception");
+//        }
 
     }
 

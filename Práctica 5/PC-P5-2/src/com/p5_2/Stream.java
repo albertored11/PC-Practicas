@@ -2,8 +2,9 @@ package com.p5_2;
 
 import java.io.InputStream;
 import java.io.OutputStream;
+import java.io.Serializable;
 
-public class Stream {
+public class Stream implements Serializable {
 
     private OutputStream _out;
     private InputStream _in;

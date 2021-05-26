@@ -2,17 +2,17 @@ package com.p5_2;
 
 public abstract class MensajeDesdeCliente extends Mensaje {
 
-    private final String _username;
+    private final Usuario _user;
 
-    public MensajeDesdeCliente(String tipo, String origen, String destino, String username) {
+    public MensajeDesdeCliente(String tipo, String origen, String destino, Usuario user) {
 
         super(tipo, origen, destino);
 
-        _username = username;
+        _user = user;
 
     }
 
-    public String getUsername() {
-        return _username;
+    public Usuario getUser() {
+        return _user;
     }
 }

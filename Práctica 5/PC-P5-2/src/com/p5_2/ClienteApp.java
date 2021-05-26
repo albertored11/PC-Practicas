@@ -1,0 +1,154 @@
+package com.p5_2;
+
+import java.io.*;
+import java.net.InetAddress;
+import java.net.Socket;
+import java.net.UnknownHostException;
+import java.util.Scanner;
+
+import static java.lang.System.exit;
+
+public class ClienteApp {
+
+    public static void main(String[] args) throws UnknownHostException {
+
+        Scanner in = new Scanner(System.in);
+
+        String hostname = InetAddress.getLocalHost().toString();
+
+        System.out.print("Username: ");
+        String username = in.nextLine();
+
+        System.out.print("Server: ");
+        String server = in.nextLine();
+
+        System.out.print("Port: ");
+        int port = in.nextInt();
+        in.nextLine(); // consume \n from int
+
+        Usuario user = new Usuario(username, hostname);
+
+        try {
+
+            Socket sock = new Socket(server, port);
+
+            OutputStream outStr = sock.getOutputStream();
+            InputStream inStr = sock.getInputStream();
+
+            ObjectOutputStream objOutStr = new ObjectOutputStream(outStr);
+
+            Stream stream = new Stream(outStr, inStr);
+
+            Cliente client = new Cliente(user, stream);
+
+            (new OyenteServidor(client, outStr, inStr)).start();
+
+            System.out.println("Files to share? (end with empty input)");
+
+            System.out.print("Path to file: ");
+            String filepath = in.nextLine();
+
+            while (!filepath.isEmpty()) {
+
+                user.addFile(new Fichero(filepath));
+
+                System.out.print("Path to file: ");
+                filepath = in.nextLine();
+
+            }
+
+            // TODO cambiar origen y destino
+            Mensaje mc = new MensajeConexion("Client 1", "Server", user);
+
+            objOutStr.writeObject(mc);
+
+            int option;
+
+            do {
+
+                System.out.println();
+                System.out.println("    ~ MENU ~");
+                System.out.println("1. Get user list");
+                System.out.println("2. Request file");
+                System.out.println("0. Exit");
+                System.out.print("Choose an option: ");
+
+                option = in.nextInt();
+                in.nextLine(); // consume \n from int
+
+                switch (option) {
+
+                    case 1 -> {
+
+                        MensajeListaUsuarios m = new MensajeListaUsuarios("Client 1", "Server", user);
+
+                        objOutStr.writeObject(m);
+
+                    }
+
+                    case 2 -> {
+
+                        System.out.print("Path to file: ");
+                        Fichero file = new Fichero(in.nextLine());
+
+                        MensajePedirFichero m = new MensajePedirFichero("Client 1", "Server", file, user);
+
+                        objOutStr.writeObject(m);
+
+                    }
+
+                    case 0 -> {
+
+                        MensajeCerrarConexion m = new MensajeCerrarConexion("Client 1", "Server", user);
+
+                        objOutStr.writeObject(m);
+
+                    }
+
+                }
+
+            } while (option != 0);
+
+//            in.close();
+
+//            ObjectInputStream objInStr = new ObjectInputStream(sock.getInputStream());
+//
+//            Fichero file = (Fichero)objInStr.readObject();
+//
+//            System.out.print("Path to file: ");
+//            String filepath = in.nextLine();
+//
+//            PrintWriter writer = new PrintWriter(outStr, true);
+//            BufferedReader reader = new BufferedReader(new InputStreamReader(inStr));
+//
+//            writer.println(filepath);
+//
+//            String text = reader.readLine();
+//
+//            if (text.equals("FILE_NOT_FOUND")) {
+//                System.err.println("ERROR: File " + filepath + " not found");
+//                exit(1);
+//            }
+//
+//            while (text != null) {
+//                System.out.println(text);
+//                text = reader.readLine();
+//            }
+//
+//            outStr.close();
+//            inStr.close();
+//            writer.close();
+//            reader.close();
+
+        }
+        catch (IOException e) {
+            System.err.println("ERROR: IO exception");
+            e.printStackTrace(); // TODO quitar
+        }
+        catch (Exception e) {
+            e.printStackTrace();
+        }
+
+    }
+
+}

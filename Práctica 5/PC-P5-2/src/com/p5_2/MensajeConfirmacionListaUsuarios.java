@@ -1,21 +1,20 @@
 package com.p5_2;
 
 import java.util.List;
-import java.util.Map;
 
 public class MensajeConfirmacionListaUsuarios extends Mensaje {
 
-    private final Map<String, List<Fichero>> _userFileMap;
+    private final List<Usuario> _userList;
 
-    public MensajeConfirmacionListaUsuarios(String origen, String destino, Map<String, List<Fichero>> userFileMap) {
+    public MensajeConfirmacionListaUsuarios(String origen, String destino, List<Usuario> userList) {
 
         super("MENSAJE_CONFIRMACION_LISTA_USUARIOS", origen, destino);
 
-        _userFileMap = userFileMap;
+        _userList = userList;
 
     }
 
-    public Map<String, List<Fichero>> getUserFileMap() {
-        return _userFileMap;
+    public List<Usuario> getUserList() {
+        return _userList;
     }
 }

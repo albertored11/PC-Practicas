@@ -2,17 +2,10 @@ package com.p5_2;
 
 public class MensajeCerrarConexion extends MensajeDesdeCliente {
 
-    private final int _userId;
+    public MensajeCerrarConexion(String origen, String destino, Usuario user) {
 
-    public MensajeCerrarConexion(String origen, String destino, String username, int userId) {
-
-        super("MENSAJE_CERRAR_CONEXION", origen, destino, username);
-
-        _userId = userId;
+        super("MENSAJE_CERRAR_CONEXION", origen, destino, user);
 
     }
 
-    public int getUserId() {
-        return _userId;
-    }
 }

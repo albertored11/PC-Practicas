@@ -1,6 +1,8 @@
 package com.p5_2;
 
-public abstract class Mensaje {
+import java.io.Serializable;
+
+public abstract class Mensaje implements Serializable {
 
     private String _tipo;
     private String _origen;
