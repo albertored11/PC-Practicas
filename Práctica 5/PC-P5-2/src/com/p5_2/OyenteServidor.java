@@ -5,6 +5,7 @@ import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.io.OutputStream;
 import java.util.List;
+import java.util.concurrent.Semaphore;
 
 public class OyenteServidor extends Thread {
 
@@ -29,11 +30,14 @@ public class OyenteServidor extends Thread {
 
                 Mensaje m = (Mensaje)_objInStr.readObject();
 
+                Semaphore sem = _client.getSem();
+
                 switch (m.getTipo()) {
 
                     case "MENSAJE_CONFIRMACION_CONEXION":
 
                         System.out.println("Conexión establecida");
+                        System.out.println();
 
                         break;
 
@@ -47,6 +51,8 @@ public class OyenteServidor extends Thread {
 
                         for (Usuario user : userList)
                             System.out.println(user);
+
+                        System.out.println();
 
                         break;
 
@@ -73,10 +79,13 @@ public class OyenteServidor extends Thread {
                     case "MENSAJE_CONFIRMACION_CERRAR_CONEXION":
 
                         System.out.println("Conexión terminada");
+                        System.out.println();
 
                         break;
 
                 }
+
+                sem.release();
 
             }
 

@@ -15,6 +15,8 @@ public class ServidorApp {
         System.out.print("Port: ");
         int port = in.nextInt();
 
+        System.out.println();
+
         Servidor server = new Servidor(port);
 
         try {
@@ -26,6 +28,7 @@ public class ServidorApp {
                 Socket sock = server.getServSock().accept();
 
                 System.out.println("Client connected from " + sock.getInetAddress().toString().substring(1));
+                System.out.println();
 
                 OutputStream outStr = sock.getOutputStream();
                 InputStream inStr = sock.getInputStream();

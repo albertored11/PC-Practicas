@@ -5,6 +5,7 @@ import java.net.InetAddress;
 import java.net.Socket;
 import java.net.UnknownHostException;
 import java.util.Scanner;
+import java.util.concurrent.Semaphore;
 
 import static java.lang.System.exit;
 
@@ -25,6 +26,8 @@ public class ClienteApp {
         System.out.print("Port: ");
         int port = in.nextInt();
         in.nextLine(); // consume \n from int
+
+        System.out.println();
 
         Usuario user = new Usuario(username, hostname);
 
@@ -58,16 +61,21 @@ public class ClienteApp {
 
             }
 
+            System.out.println();
+
             // TODO cambiar origen y destino
             Mensaje mc = new MensajeConexion("Client 1", "Server", user);
 
             objOutStr.writeObject(mc);
 
+            Semaphore sem = client.getSem();
+
             int option;
 
             do {
 
-                System.out.println();
+                sem.acquire();
+
                 System.out.println("    ~ MENU ~");
                 System.out.println("1. Get user list");
                 System.out.println("2. Request file");
@@ -76,6 +84,8 @@ public class ClienteApp {
 
                 option = in.nextInt();
                 in.nextLine(); // consume \n from int
+
+                System.out.println();
 
                 switch (option) {
 
