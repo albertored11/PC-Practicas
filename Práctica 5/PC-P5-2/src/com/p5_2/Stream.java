@@ -1,27 +1,25 @@
 package com.p5_2;
 
-import java.io.InputStream;
-import java.io.OutputStream;
-import java.io.Serializable;
+import java.io.*;
 
 public class Stream implements Serializable {
 
-    private OutputStream _out;
-    private InputStream _in;
+    private ObjectOutputStream _objOutStr;
+    private ObjectInputStream _objInStr;
 
-    public Stream(OutputStream out, InputStream in) {
+    public Stream(ObjectOutputStream objOutStr, ObjectInputStream objInStr) {
 
-        _out = out;
-        _in = in;
+        _objOutStr = objOutStr;
+        _objInStr = objInStr;
 
     }
 
-    public OutputStream getOut() {
-        return _out;
+    public ObjectOutputStream getObjOutStr() {
+        return _objOutStr;
     }
 
-    public InputStream getIn() {
-        return _in;
+    public ObjectInputStream getObjInStr() {
+        return _objInStr;
     }
 
 }

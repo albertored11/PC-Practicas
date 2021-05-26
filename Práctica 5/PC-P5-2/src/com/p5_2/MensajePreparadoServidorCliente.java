@@ -7,7 +7,7 @@ public class MensajePreparadoServidorCliente extends Mensaje {
 
     public MensajePreparadoServidorCliente(String origen, String destino, Usuario user, int port) {
 
-        super("MENSAJE_PREPARADO_SERVIDOR_CLIENTE", origen, destino);
+        super("MENSAJE_PREPARADO_SERVIDORCLIENTE", origen, destino);
 
         _user = user;
         _port = port;

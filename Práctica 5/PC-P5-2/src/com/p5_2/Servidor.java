@@ -1,6 +1,7 @@
 package com.p5_2;
 
 import java.io.IOException;
+import java.io.ObjectOutputStream;
 import java.io.OutputStream;
 import java.net.InetAddress;
 import java.net.ServerSocket;
@@ -47,8 +48,8 @@ public class Servidor {
         return _userStreamMap;
     }
 
-    public OutputStream getOutputStream(Usuario user) {
-        return _userStreamMap.get(user).getOut();
+    public ObjectOutputStream getObjectOutputStream(Usuario user) {
+        return _userStreamMap.get(user).getObjOutStr();
     }
 
     public List<Usuario> getUserList() {
@@ -86,7 +87,7 @@ public class Servidor {
 
         for (Usuario user : _userList)
             for (Fichero file : user.getFileList())
-                if (file.getFilePath().equals(filename))
+                if (file.getFilePath().equals(filename.getFilePath()))
                     return user;
 
         return null;

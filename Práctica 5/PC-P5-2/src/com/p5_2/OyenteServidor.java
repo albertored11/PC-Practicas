@@ -72,6 +72,8 @@ public class OyenteServidor extends Thread {
 
                         MensajePreparadoServidorCliente mpsc = (MensajePreparadoServidorCliente)m;
 
+                        System.out.println("MENSAJE_PREPARADO_SERVIDORCLIENTE recibido!");
+
                         (new Receptor(mpsc.getUser(), mpsc.getPort())).start();
 
                         break;

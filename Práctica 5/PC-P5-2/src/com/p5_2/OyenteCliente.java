@@ -37,7 +37,7 @@ public class OyenteCliente extends Thread {
                         MensajeConexion mc = (MensajeConexion)m;
                         user = mc.getUser();
 
-                        Stream stream = new Stream(_outStr, _inStr);
+                        Stream stream = new Stream(objOutStr, objInStr);
 
                         _server.putInUserStreamMap(mc.getUser(), stream);
                         _server.addToUserList(user, user.getFileList());
@@ -79,7 +79,7 @@ public class OyenteCliente extends Thread {
 
                         Usuario user1 = _server.getFileUser(file);
 
-                        ObjectOutputStream objOutStr1 = new ObjectOutputStream(_server.getOutputStream(user1));
+                        ObjectOutputStream objOutStr1 = _server.getObjectOutputStream(user1);
 
                         Mensaje mef = new MensajeEmitirFichero(mpf.getDestino(), mpf.getOrigen(), file);
 
@@ -94,9 +94,13 @@ public class OyenteCliente extends Thread {
                             break;
                         }
 
-                        MensajePreparadoClienteServidor mpcs = (MensajePreparadoClienteServidor) m;
+                        MensajePreparadoClienteServidor mpcs = (MensajePreparadoClienteServidor)m;
 
-                        ObjectOutputStream objOutStr2 = new ObjectOutputStream(_server.getOutputStream(mpcs.getUser()));
+                        ObjectOutputStream objOutStr2 = _server.getObjectOutputStream(mpcs.getUser());
+
+                        System.out.println("Enviando mensaje a " + mpcs.getUser());
+
+                        // TODO: MENSAJE_PREPARADO_SERVIDORCLIENTE debería recibirlo el otro cliente
 
                         Mensaje mpsc = new MensajePreparadoServidorCliente(mpcs.getDestino(), mpcs.getOrigen(), user, mpcs.getPort());
 

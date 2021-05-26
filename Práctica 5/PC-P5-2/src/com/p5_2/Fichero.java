@@ -4,7 +4,7 @@ import java.io.Serializable;
 
 public class Fichero implements Serializable {
 
-    private String _filepath;
+    private final String _filepath;
 
     public Fichero(String filepath) {
 

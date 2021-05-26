@@ -41,7 +41,7 @@ public class ClienteApp {
             ObjectOutputStream objOutStr = new ObjectOutputStream(outStr);
             ObjectInputStream objInStr = new ObjectInputStream(inStr);
 
-            Stream stream = new Stream(outStr, inStr);
+            Stream stream = new Stream(objOutStr, objInStr);
 
             Cliente client = new Cliente(user, stream);
 
