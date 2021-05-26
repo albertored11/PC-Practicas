@@ -28,17 +28,11 @@ public class OyenteCliente extends Thread {
 
             while (true) {
 
-                System.out.println("Waiting for message...");
-
                 Mensaje m = (Mensaje)objInStr.readObject();
-
-                System.out.println(m);
 
                 switch (m.getTipo()) {
 
                     case "MENSAJE_CONEXION":
-
-                        System.out.println("MENSAJE_CONEXION recibido!");
 
                         MensajeConexion mc = (MensajeConexion)m;
                         user = mc.getUser();

@@ -9,14 +9,14 @@ import java.util.List;
 public class OyenteServidor extends Thread {
 
     private final Cliente _client;
-    private final OutputStream _outStr;
-    private final InputStream _inStr;
+    private final ObjectOutputStream _objOutStr;
+    private final ObjectInputStream _objInStr;
 
-    public OyenteServidor(Cliente client, OutputStream outStr, InputStream inStr) {
+    public OyenteServidor(Cliente client, ObjectOutputStream objOutStr, ObjectInputStream objInStr) {
 
         _client = client;
-        _outStr = outStr;
-        _inStr = inStr;
+        _objOutStr = objOutStr;
+        _objInStr = objInStr;
 
     }
 
@@ -25,12 +25,9 @@ public class OyenteServidor extends Thread {
         
         try { // TODO tratar excepciones
 
-            ObjectInputStream objInStr = new ObjectInputStream(_inStr);
-            ObjectOutputStream objOutStr = new ObjectOutputStream(_outStr);
-
             while (true) {
 
-                Mensaje m = (Mensaje)objInStr.readObject();
+                Mensaje m = (Mensaje)_objInStr.readObject();
 
                 switch (m.getTipo()) {
 
@@ -59,7 +56,7 @@ public class OyenteServidor extends Thread {
 
                         MensajePreparadoClienteServidor mpcs = new MensajePreparadoClienteServidor(mef.getDestino(), mef.getOrigen(), _client.getUser());
 
-                        objOutStr.writeObject(mpcs);
+                        _objOutStr.writeObject(mpcs);
 
                         (new Emisor(mef.getFile(), mpcs.getPort())).start();
 

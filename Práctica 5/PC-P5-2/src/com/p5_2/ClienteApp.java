@@ -36,12 +36,13 @@ public class ClienteApp {
             InputStream inStr = sock.getInputStream();
 
             ObjectOutputStream objOutStr = new ObjectOutputStream(outStr);
+            ObjectInputStream objInStr = new ObjectInputStream(inStr);
 
             Stream stream = new Stream(outStr, inStr);
 
             Cliente client = new Cliente(user, stream);
 
-            (new OyenteServidor(client, outStr, inStr)).start();
+            (new OyenteServidor(client, objOutStr, objInStr)).start();
 
             System.out.println("Files to share? (end with empty input)");
 
