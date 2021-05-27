@@ -22,6 +22,8 @@ public class Receptor extends Thread {
 
             Socket sock = new Socket(_emisor.getInetAddress(), _port);
 
+            System.out.println("Socket establecido para recibir fichero!");
+
             InputStream inStr = sock.getInputStream();
             ObjectInputStream objInStr = new ObjectInputStream(inStr);
 

@@ -15,7 +15,7 @@ public class ClienteApp {
 
         Scanner in = new Scanner(System.in);
 
-        String hostname = InetAddress.getLocalHost().toString();
+        String hostname = "localhost";
 
         System.out.print("Username: ");
         String username = in.nextLine();
