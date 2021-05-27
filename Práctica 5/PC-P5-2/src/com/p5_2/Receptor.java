@@ -2,16 +2,19 @@ package com.p5_2;
 
 import java.io.*;
 import java.net.Socket;
+import java.util.concurrent.Semaphore;
 
 public class Receptor extends Thread {
 
     private final Usuario _emisor;
     private final int _port;
+    private final Semaphore _sem;
 
-    public Receptor(Usuario emisor, int port) {
+    public Receptor(Usuario emisor, int port, Semaphore sem) {
 
         _emisor = emisor;
         _port = port;
+        _sem = sem;
 
     }
 
@@ -22,7 +25,7 @@ public class Receptor extends Thread {
 
             Socket sock = new Socket(_emisor.getInetAddress(), _port);
 
-            System.out.println("Socket establecido para recibir fichero!");
+//            System.out.println("Socket establecido para recibir fichero!");
 
             InputStream inStr = sock.getInputStream();
             ObjectInputStream objInStr = new ObjectInputStream(inStr);
@@ -32,6 +35,8 @@ public class Receptor extends Thread {
             // TODO save String to file
 
             System.out.println(file);
+
+            _sem.release();
 
         }
         catch (Exception e) {}

@@ -102,6 +102,8 @@ public class ClienteApp {
                         System.out.print("Path to file: ");
                         String file = in.nextLine();
 
+                        System.out.println();
+
                         MensajePedirFichero mpf = new MensajePedirFichero("Client 1", "Server", file, user);
 
                         objOutStr.writeObject(mpf);

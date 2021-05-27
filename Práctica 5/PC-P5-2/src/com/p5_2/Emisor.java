@@ -32,7 +32,7 @@ public class Emisor extends Thread {
             FileReader fileReader = new FileReader(file);
             BufferedReader bufReader = new BufferedReader(fileReader);
 
-            System.out.println("Reading from " + _file + "...");
+//            System.out.println("Reading from " + _file + "...");
 
             StringBuilder textBuilder = new StringBuilder();
 
@@ -44,7 +44,7 @@ public class Emisor extends Thread {
                 text = bufReader.readLine();
             }
 
-            System.out.println("Sending text from " + _file + "...");
+//            System.out.println("Sending text from " + _file + "...");
 
             objOutStr.writeObject(textBuilder.toString());
 

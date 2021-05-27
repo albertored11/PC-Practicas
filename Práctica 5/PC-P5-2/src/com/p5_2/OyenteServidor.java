@@ -39,6 +39,8 @@ public class OyenteServidor extends Thread {
                         System.out.println("Conexión establecida");
                         System.out.println();
 
+                        sem.release();
+
                         break;
 
                     case "MENSAJE_CONFIRMACION_LISTA_USUARIOS":
@@ -54,13 +56,13 @@ public class OyenteServidor extends Thread {
 
                         System.out.println();
 
+                        sem.release();
+
                         break;
 
                     case "MENSAJE_EMITIR_FICHERO":
 
                         MensajeEmitirFichero mef = (MensajeEmitirFichero)m;
-
-                        System.out.println("MENSAJE_EMITIR_FICHERO recibido!");
 
                         MensajePreparadoClienteServidor mpcs = new MensajePreparadoClienteServidor(mef.getDestino(), mef.getOrigen(), _client.getUser(), mef.getDestUser());
 
@@ -68,28 +70,25 @@ public class OyenteServidor extends Thread {
 
                         (new Emisor(mef.getFile(), mpcs.getPort())).start();
 
+                        sem.release();
+
                         break;
 
                     case "MENSAJE_PREPARADO_SERVIDORCLIENTE":
 
                         MensajePreparadoServidorCliente mpsc = (MensajePreparadoServidorCliente)m;
 
-                        System.out.println("MENSAJE_PREPARADO_SERVIDORCLIENTE recibido!");
-
-                        (new Receptor(mpsc.getUser(), mpsc.getPort())).start();
+                        (new Receptor(mpsc.getUser(), mpsc.getPort(), sem)).start();
 
                         break;
 
                     case "MENSAJE_CONFIRMACION_CERRAR_CONEXION":
 
                         System.out.println("Conexión terminada");
-                        System.out.println();
 
-                        break;
+                        return;
 
                 }
-
-                sem.release();
 
             }
 
