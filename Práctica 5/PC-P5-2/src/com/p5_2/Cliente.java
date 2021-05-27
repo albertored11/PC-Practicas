@@ -5,8 +5,8 @@ import java.util.concurrent.Semaphore;
 public class Cliente {
 
     private final Usuario _user;
-    private final Semaphore _sem;
-    private boolean _terminate;
+    private final Semaphore _sem; // semáforo para controlar el flujo de stdout
+    private boolean _terminate; // para que OyenteServidor nos pueda pedir que terminemos
 
     public Cliente(Usuario user) {
 

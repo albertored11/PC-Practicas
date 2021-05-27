@@ -100,13 +100,24 @@ public class OyenteServidor extends Thread {
 
                         MensajeUsuarioRepetido mur = (MensajeUsuarioRepetido)m;
 
-                        System.err.println("ERROR: El usuario " + mur.getUsername() + " ya existe");
+                        System.err.println("ERROR: el usuario " + mur.getUsername() + " ya existe");
 
                         _client.terminate();
 
                         sem.release();
 
                         return;
+
+                    case "MENSAJE_NO_EXISTE_FICHERO":
+
+                        MensajeNoExisteFichero mnef = (MensajeNoExisteFichero)m;
+
+                        System.err.println("ERROR: el fichero " + mnef.getFilename() + " no está disponible");
+                        System.out.println();
+
+                        sem.release();
+
+                        break;
 
                     default:
 

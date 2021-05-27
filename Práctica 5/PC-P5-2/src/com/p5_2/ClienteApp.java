@@ -10,14 +10,26 @@ import static java.lang.System.exit;
 
 public class ClienteApp {
 
-    public static void main(String[] args) throws SocketException {
+    public static void main(String[] args) {
 
         Scanner in = new Scanner(System.in);
 
+        // Leer nombre de usuario
         System.out.print("Username: ");
         String username = in.nextLine();
 
-        Enumeration<NetworkInterface> ifaces = NetworkInterface.getNetworkInterfaces();
+        // Obtener interfaces de red del sistema
+        Enumeration<NetworkInterface> ifaces = null;
+
+        try {
+            ifaces = NetworkInterface.getNetworkInterfaces();
+        } catch (SocketException e) {
+            System.err.println("ERROR: could not retrieve network interfaces");
+            in.close();
+            exit(1);
+        }
+
+        // Guardar la lista de interfaces de red en un String
         StringBuilder sb = new StringBuilder();
 
         if (ifaces.hasMoreElements())
@@ -28,11 +40,20 @@ public class ClienteApp {
             sb.append(ifaces.nextElement().getDisplayName());
         }
 
+        // Mostrar interfaces de red disponibles
         System.out.print("Network interface (" + sb + "): ");
 
+        // Leer interfaz de red
         String iface = in.nextLine();
 
-        NetworkInterface ni = NetworkInterface.getByName(iface);
+        // Guardar la primera dirección IPv4 que se encuentre en la interfaz
+        NetworkInterface ni = null;
+
+        try {
+            ni = NetworkInterface.getByName(iface);
+        } catch (SocketException e) {
+            e.printStackTrace();
+        }
         Enumeration<InetAddress> en = ni.getInetAddresses();
 
         InetAddress i = en.nextElement();
@@ -42,31 +63,39 @@ public class ClienteApp {
 
         String hostname = i.toString().substring(1);
 
+        // Leer dirección del servidor
         System.out.print("Server: ");
         String server = in.nextLine();
 
+        // Leer puerto del servidor
         System.out.print("Port: ");
         int port = in.nextInt();
         in.nextLine(); // consume \n from int
 
         System.out.println();
 
+        // Crear instancia de usuario
         Usuario user = new Usuario(username, hostname);
 
         try {
 
+            // Crear socket cliente-servidor
             Socket sock = new Socket(server, port);
 
+            // Obtener flujos de entrada y de salida
             OutputStream outStr = sock.getOutputStream();
             InputStream inStr = sock.getInputStream();
 
             ObjectOutputStream objOutStr = new ObjectOutputStream(outStr);
             ObjectInputStream objInStr = new ObjectInputStream(inStr);
 
+            // Crear instancia de cliente
             Cliente client = new Cliente(user);
 
+            // Lanzar hilo OyenteServidor para gestionar los mensajes recibidos
             (new OyenteServidor(client, objOutStr, objInStr)).start();
 
+            // Leer rutas de ficheros que se pondrán a disposición de los demás clientes
             System.out.println("Files to share? (end with empty input)");
 
             System.out.print("Path to file: ");
@@ -83,6 +112,7 @@ public class ClienteApp {
 
             System.out.println();
 
+            // Enviar MENSAJE_CONEXION
             Mensaje mc = new MensajeConexion(user);
 
             objOutStr.writeObject(mc);
@@ -93,11 +123,23 @@ public class ClienteApp {
 
             do {
 
+                // Post a semáforo: espera a que OyenteServidor haga release antes de volver a mostrar el menú
                 sem.acquire();
 
-                if (client.isTerminate())
+                // Será true si el usuario ya existe, con lo que cerramos la aplicación
+                if (client.isTerminate()) {
+
+                    in.close();
+                    outStr.close();
+                    inStr.close();
+                    objOutStr.close();
+                    objInStr.close();
+
                     exit(1);
 
+                }
+
+                // Mostrar menú
                 System.out.println("    ~ MENU ~");
                 System.out.println("1. Get user list");
                 System.out.println("2. Request file");
@@ -105,10 +147,12 @@ public class ClienteApp {
                 System.out.println();
                 System.out.print("Choose an option: ");
 
+                // Leer opción
                 String line = in.nextLine();
 
                 System.out.println();
 
+                // Comprobar que la opción es un entero
                 try {
                     option = Integer.parseInt(line);
                 }
@@ -125,6 +169,7 @@ public class ClienteApp {
 
                     case 1:
 
+                        // Mandar MENSAJE_LISTA_USUARIOS a OyenteCliente
                         MensajeListaUsuarios m = new MensajeListaUsuarios(user);
 
                         objOutStr.writeObject(m);
@@ -133,13 +178,13 @@ public class ClienteApp {
 
                     case 2:
 
-                        // TODO si nadie lo tiene, error
-
+                        // Leer ruta del fichero que se quiere obtener
                         System.out.print("Path to file: ");
                         String file = in.nextLine();
 
                         System.out.println();
 
+                        // Mandar MENSAJE_PEDIR_FICHERO a OyenteCliente
                         MensajePedirFichero mpf = new MensajePedirFichero(file, user);
 
                         objOutStr.writeObject(mpf);

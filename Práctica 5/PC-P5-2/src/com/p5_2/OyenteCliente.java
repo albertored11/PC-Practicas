@@ -88,6 +88,16 @@ public class OyenteCliente extends Thread {
 
                         Usuario user1 = _server.getFileUser(file);
 
+                        if (user1 == null) {
+
+                            MensajeNoExisteFichero mnef = new MensajeNoExisteFichero(file);
+
+                            objOutStr.writeObject(mnef);
+
+                            break;
+
+                        }
+
                         ObjectOutputStream objOutStr1 = _server.getObjectOutputStream(user1);
 
                         MensajeEmitirFichero mef = new MensajeEmitirFichero(file, mpf.getUser(), _server.getAndIncrementNextPort());
