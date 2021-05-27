@@ -6,6 +6,8 @@ import java.net.Socket;
 
 public class Emisor extends Thread {
 
+    // TODO si hay un error aquí, Receptor se queda colgado
+
     private final String _file;
     private final int _port;
 
