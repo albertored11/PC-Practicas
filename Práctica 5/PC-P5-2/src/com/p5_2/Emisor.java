@@ -19,37 +19,85 @@ public class Emisor extends Thread {
     @Override
     public void run() {
 
-        try { // TODO tratar excepciones
+        ServerSocket servSock;
 
-            ServerSocket servSock = new ServerSocket(_port);
+        try {
+            servSock = new ServerSocket(_port);
+        } catch (IOException e) {
+            System.err.println("ERROR: I/O error in socket");
+            return;
+        }
 
-            Socket sock = servSock.accept();
+        Socket sock;
 
-            OutputStream outStr = sock.getOutputStream();
-            ObjectOutputStream objOutStr = new ObjectOutputStream(outStr);
+        try {
+            sock = servSock.accept();
+        } catch (IOException e) {
+            System.err.println("ERROR: I/O error in server socket");
+            return;
+        }
 
-            File file = new File(_file);
-            FileReader fileReader = new FileReader(file);
-            BufferedReader bufReader = new BufferedReader(fileReader);
+        OutputStream outStr;
 
-//            System.out.println("Reading from " + _file + "...");
+        try {
+            outStr = sock.getOutputStream();
+        } catch (IOException e) {
+            System.err.println("ERROR: I/O error in socket");
+            return;
+        }
 
-            StringBuilder textBuilder = new StringBuilder();
+        ObjectOutputStream objOutStr;
 
-            String text = bufReader.readLine();
+        try {
+            objOutStr = new ObjectOutputStream(outStr);
+        } catch (IOException e) {
+            System.err.println("ERROR: I/O error in stream");
+            return;
+        }
 
-            while (text != null) {
-                textBuilder.append(text);
-                textBuilder.append('\n');
+        File file = new File(_file);
+
+        FileReader fileReader;
+
+        try {
+            fileReader = new FileReader(file);
+        } catch (FileNotFoundException e) {
+            System.err.println("ERROR: file " + _file + " not found");
+            return;
+        }
+
+        BufferedReader bufReader = new BufferedReader(fileReader);
+
+        StringBuilder textBuilder = new StringBuilder();
+
+        String text;
+
+        try {
+            text = bufReader.readLine();
+        } catch (IOException e) {
+            System.err.println("ERROR: I/O error in buffer");
+            return;
+        }
+
+        while (text != null) {
+
+            textBuilder.append(text);
+            textBuilder.append('\n');
+
+            try {
                 text = bufReader.readLine();
+            } catch (IOException e) {
+                System.err.println("ERROR: I/O error in buffer");
+                return;
             }
 
-//            System.out.println("Sending text from " + _file + "...");
-
-            objOutStr.writeObject(textBuilder.toString());
-
         }
-        catch (Exception e) {}
+
+        try {
+            objOutStr.writeObject(textBuilder.toString());
+        } catch (IOException e) {
+            System.err.println("ERROR: I/O error in stream");
+        }
 
     }
 
