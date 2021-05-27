@@ -2,7 +2,6 @@ package com.p5_2;
 
 import java.io.IOException;
 import java.io.ObjectOutputStream;
-import java.io.OutputStream;
 import java.net.InetAddress;
 import java.net.ServerSocket;
 import java.net.UnknownHostException;
@@ -10,6 +9,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.concurrent.Semaphore;
 
 import static java.lang.System.exit;
 
@@ -20,6 +20,7 @@ public class Servidor {
     private String _inetAddress;
     private int _port;
     private ServerSocket _servSock;
+    private Semaphore _semUserStreamMap;
 
     public Servidor(int port) {
 
@@ -42,14 +43,18 @@ public class Servidor {
             exit(1);
         }
 
+        _semUserStreamMap = new Semaphore(1);
+
     }
 
     public Map<Usuario, Stream> getUserStreamMap() {
         return _userStreamMap;
     }
 
-    public ObjectOutputStream getObjectOutputStream(Usuario user) {
+    public ObjectOutputStream getObjectOutputStream(Usuario user) throws InterruptedException {
+
         return _userStreamMap.get(user).getObjOutStr();
+
     }
 
     public List<Usuario> getUserList() {
@@ -68,11 +73,13 @@ public class Servidor {
         return _servSock;
     }
 
-    public void putInUserStreamMap(Usuario user, Stream stream) {
+    public void putInUserStreamMap(Usuario user, Stream stream) throws InterruptedException {
+
         _userStreamMap.put(user, stream);
+
     }
 
-    public void addToUserList(Usuario user, List<Fichero> fileList) {
+    public void addToUserList(Usuario user) {
         _userList.add(user);
     }
 
@@ -91,6 +98,21 @@ public class Servidor {
                     return user;
 
         return null;
+
+    }
+
+    public Semaphore getSemUserStreamMap() {
+        return _semUserStreamMap;
+    }
+
+    // Get original reference for a username; returns itself it not found
+    public Usuario getOriginalUser(Usuario user) {
+
+        for (Usuario u : _userList)
+            if (u.toString().equals(user.toString()))
+                return u;
+
+        return user;
 
     }
 

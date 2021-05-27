@@ -37,10 +37,15 @@ public class OyenteCliente extends Thread {
                         MensajeConexion mc = (MensajeConexion)m;
                         user = mc.getUser();
 
+                        System.out.println("MENSAJE_CONEXION recibido!");
+
                         Stream stream = new Stream(objOutStr, objInStr);
 
-                        _server.putInUserStreamMap(mc.getUser(), stream);
-                        _server.addToUserList(user, user.getFileList());
+                        _server.getSemUserStreamMap().acquire();
+                        _server.putInUserStreamMap(user, stream);
+                        _server.getSemUserStreamMap().release();
+
+                        _server.addToUserList(user);
 
                         Mensaje mcc = new MensajeConfirmacionConexion(mc.getDestino(), mc.getOrigen());
 
@@ -73,15 +78,19 @@ public class OyenteCliente extends Thread {
 
                     case "MENSAJE_PEDIR_FICHERO":
 
-                        MensajePedirFichero mpf = (MensajePedirFichero) m;
+                        MensajePedirFichero mpf = (MensajePedirFichero)m;
+
+                        System.out.println("MENSAJE_PEDIR_FICHERO recibido!");
 
                         Fichero file = mpf.getFile();
 
                         Usuario user1 = _server.getFileUser(file);
 
+                        _server.getSemUserStreamMap().acquire();
                         ObjectOutputStream objOutStr1 = _server.getObjectOutputStream(user1);
+                        _server.getSemUserStreamMap().release();
 
-                        Mensaje mef = new MensajeEmitirFichero(mpf.getDestino(), mpf.getOrigen(), file);
+                        MensajeEmitirFichero mef = new MensajeEmitirFichero(mpf.getDestino(), mpf.getOrigen(), file, mpf.getUser());
 
                         objOutStr1.writeObject(mef);
 
@@ -96,9 +105,15 @@ public class OyenteCliente extends Thread {
 
                         MensajePreparadoClienteServidor mpcs = (MensajePreparadoClienteServidor)m;
 
-                        ObjectOutputStream objOutStr2 = _server.getObjectOutputStream(mpcs.getUser());
+                        System.out.println("MENSAJE_PREPARADO_CLIENTESERVIDOR recibido!");
 
-                        System.out.println("Enviando mensaje a " + mpcs.getUser());
+                        Usuario destUser = _server.getOriginalUser(mpcs.getDestUser());
+
+                        _server.getSemUserStreamMap().acquire();
+                        ObjectOutputStream objOutStr2 = _server.getObjectOutputStream(destUser);
+                        _server.getSemUserStreamMap().release();
+
+                        System.out.println("Enviando mensaje a " + destUser);
 
                         // TODO: MENSAJE_PREPARADO_SERVIDORCLIENTE debería recibirlo el otro cliente
 

@@ -60,7 +60,9 @@ public class OyenteServidor extends Thread {
 
                         MensajeEmitirFichero mef = (MensajeEmitirFichero)m;
 
-                        MensajePreparadoClienteServidor mpcs = new MensajePreparadoClienteServidor(mef.getDestino(), mef.getOrigen(), _client.getUser());
+                        System.out.println("MENSAJE_EMITIR_FICHERO recibido!");
+
+                        MensajePreparadoClienteServidor mpcs = new MensajePreparadoClienteServidor(mef.getDestino(), mef.getOrigen(), _client.getUser(), mef.getDestUser());
 
                         _objOutStr.writeObject(mpcs);
 

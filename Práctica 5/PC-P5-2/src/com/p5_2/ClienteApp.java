@@ -89,32 +89,32 @@ public class ClienteApp {
 
                 switch (option) {
 
-                    case 1 -> {
+                    case 1:
 
                         MensajeListaUsuarios m = new MensajeListaUsuarios("Client 1", "Server", user);
 
                         objOutStr.writeObject(m);
 
-                    }
+                        break;
 
-                    case 2 -> {
+                    case 2:
 
                         System.out.print("Path to file: ");
                         Fichero file = new Fichero(in.nextLine());
 
-                        MensajePedirFichero m = new MensajePedirFichero("Client 1", "Server", file, user);
+                        MensajePedirFichero mpf = new MensajePedirFichero("Client 1", "Server", file, user);
 
-                        objOutStr.writeObject(m);
+                        objOutStr.writeObject(mpf);
 
-                    }
+                        break;
 
-                    case 0 -> {
+                    case 0:
 
-                        MensajeCerrarConexion m = new MensajeCerrarConexion("Client 1", "Server", user);
+                        MensajeCerrarConexion mcc = new MensajeCerrarConexion("Client 1", "Server", user);
 
-                        objOutStr.writeObject(m);
+                        objOutStr.writeObject(mcc);
 
-                    }
+                        break;
 
                 }
 

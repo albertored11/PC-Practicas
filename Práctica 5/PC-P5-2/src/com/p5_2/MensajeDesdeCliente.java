@@ -15,4 +15,5 @@ public abstract class MensajeDesdeCliente extends Mensaje {
     public Usuario getUser() {
         return _user;
     }
+
 }
