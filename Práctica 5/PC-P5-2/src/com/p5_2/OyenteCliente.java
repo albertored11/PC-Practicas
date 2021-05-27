@@ -41,7 +41,7 @@ public class OyenteCliente extends Thread {
 
                         _server.putInUserStreamMap(user, stream);
 
-                        _server.addToUserList(user); // TODO proteger lista con monitores
+                        _server.addToUserList(user);
 
                         Mensaje mcc = new MensajeConfirmacionConexion();
 

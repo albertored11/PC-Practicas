@@ -11,7 +11,8 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.concurrent.Semaphore;
+import java.util.concurrent.locks.Lock;
+import java.util.concurrent.locks.ReentrantLock;
 
 import static java.lang.System.exit;
 
@@ -25,6 +26,7 @@ public class Servidor {
     private int _nextPort;
     private final ReadersWritersController _userStreamMapController;
     private final ReadersWritersController _userListController;
+    private final Lock _nextPortLock;
 
     public Servidor(int port) {
 
@@ -51,6 +53,8 @@ public class Servidor {
 
         _userStreamMapController = new ReadersWritersController();
         _userListController = new ReadersWritersController();
+
+        _nextPortLock = new ReentrantLock(true);
 
     }
 
@@ -166,12 +170,12 @@ public class Servidor {
 
     public int getAndIncrementNextPort() {
 
-        // TODO coger lock
+        _nextPortLock.lock();
 
         int ret = _nextPort;
         _nextPort++;
 
-        // TODO soltar lock
+        _nextPortLock.unlock();
 
         return ret;
 
