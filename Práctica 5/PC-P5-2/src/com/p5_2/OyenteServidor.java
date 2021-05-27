@@ -80,8 +80,6 @@ public class OyenteServidor extends Thread {
 
                         (new Emisor(mef.getFile(), mef.getPort())).start();
 
-//                        sem.release();
-
                         break;
 
                     case "MENSAJE_PREPARADO_SERVIDORCLIENTE":

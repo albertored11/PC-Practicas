@@ -55,6 +55,7 @@ public class OyenteCliente extends Thread {
 
                         Mensaje mclu = new MensajeConfirmacionListaUsuarios(_server.getUserList());
 
+                        objOutStr.reset();
                         objOutStr.writeObject(mclu);
 
                         break;

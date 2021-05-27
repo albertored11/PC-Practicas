@@ -1,5 +1,7 @@
 package com.p5_2;
 
+import com.p5_2.sync.ReadersWritersController;
+
 import java.io.IOException;
 import java.io.ObjectOutputStream;
 import java.net.InetAddress;
@@ -15,13 +17,15 @@ import static java.lang.System.exit;
 
 public class Servidor {
 
-    private Map<Usuario, Stream> _userStreamMap;
-    private List<Usuario> _userList;
+    private final Map<Usuario, Stream> _userStreamMap;
+    private final List<Usuario> _userList;
     private String _inetAddress;
-    private int _port;
+    private final int _port;
     private ServerSocket _servSock;
-    private Semaphore _semUserStreamMap;
+    private final Semaphore _semUserStreamMap;
     private int _nextPort;
+    private final ReadersWritersController _userStreamMapController;
+    private final ReadersWritersController _userListController;
 
     public Servidor(int port) {
 
@@ -48,20 +52,37 @@ public class Servidor {
 
         _nextPort = 30000;
 
+        _userStreamMapController = new ReadersWritersController();
+        _userListController = new ReadersWritersController();
+
     }
 
     public Map<Usuario, Stream> getUserStreamMap() {
         return _userStreamMap;
     }
 
-    public ObjectOutputStream getObjectOutputStream(Usuario user) throws InterruptedException {
+    public ObjectOutputStream getObjectOutputStream(Usuario user) {
 
-        return _userStreamMap.get(user).getObjOutStr();
+        _userStreamMapController.requestRead();
+
+        ObjectOutputStream ret = _userStreamMap.get(user).getObjOutStr();
+
+        _userStreamMapController.releaseRead();
+
+        return ret;
 
     }
 
     public List<Usuario> getUserList() {
-        return _userList;
+
+        _userListController.requestRead();
+
+        List<Usuario> ret = _userList;
+
+        _userListController.releaseRead();
+
+        return ret;
+
     }
 
     public String getInetAddress() {
@@ -76,29 +97,54 @@ public class Servidor {
         return _servSock;
     }
 
-    public void putInUserStreamMap(Usuario user, Stream stream) throws InterruptedException {
+    public void putInUserStreamMap(Usuario user, Stream stream) {
+
+        _userStreamMapController.requestWrite();
 
         _userStreamMap.put(user, stream);
+
+        _userStreamMapController.releaseWrite();
 
     }
 
     public void addToUserList(Usuario user) {
+
+        _userListController.requestWrite();
+
         _userList.add(user);
+
+        _userListController.releaseWrite();
+
     }
 
     public void removeFromUserLists(Usuario user) {
 
+        _userStreamMapController.requestWrite();
+
         _userStreamMap.remove(user);
+
+        _userStreamMapController.releaseWrite();
+
+        _userListController.requestWrite();
+
         _userList.remove(user);
+
+        _userListController.releaseWrite();
 
     }
 
     public Usuario getFileUser(String filename) {
 
+        _userListController.requestRead();
+
         for (Usuario user : _userList)
             for (String file : user.getFileList())
-                if (file.equals(filename))
+                if (file.equals(filename)) {
+                    _userListController.releaseRead();
                     return user;
+                }
+
+        _userListController.releaseRead();
 
         return null;
 
@@ -111,9 +157,15 @@ public class Servidor {
     // Get original reference for a username; returns itself it not found
     public Usuario getOriginalUser(Usuario user) {
 
+        _userListController.requestRead();
+
         for (Usuario u : _userList)
-            if (u.toString().equals(user.toString()))
+            if (u.toString().equals(user.toString())) {
+                _userListController.releaseRead();
                 return u;
+            }
+
+        _userListController.releaseRead();
 
         return user;
 
