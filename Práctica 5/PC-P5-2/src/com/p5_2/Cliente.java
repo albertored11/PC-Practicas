@@ -5,14 +5,14 @@ import java.util.concurrent.Semaphore;
 public class Cliente {
 
     private final Usuario _user;
-    private final Stream _serverStream;
     private final Semaphore _sem;
+    private boolean _terminate;
 
-    public Cliente(Usuario user, Stream serverStream) {
+    public Cliente(Usuario user) {
 
         _user = user;
-        _serverStream = serverStream;
         _sem = new Semaphore(0);
+        _terminate = false;
 
     }
 
@@ -20,12 +20,16 @@ public class Cliente {
         return _user;
     }
 
-    public Stream getServerStream() {
-        return _serverStream;
-    }
-
     public Semaphore getSem() {
         return _sem;
+    }
+
+    public void terminate() {
+        _terminate = true;
+    }
+
+    public boolean isTerminate() {
+        return _terminate;
     }
 
 }

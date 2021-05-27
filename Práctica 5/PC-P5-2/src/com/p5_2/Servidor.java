@@ -181,4 +181,20 @@ public class Servidor {
 
     }
 
+    public boolean hasUser(String username) {
+
+        _userListController.requestRead();
+
+        for (Usuario u : _userList)
+            if (u.toString().equals(username)) {
+                _userListController.releaseRead();
+                return true;
+            }
+
+        _userListController.releaseRead();
+
+        return false;
+
+    }
+
 }

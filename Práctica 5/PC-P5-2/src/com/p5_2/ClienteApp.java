@@ -6,6 +6,8 @@ import java.util.Enumeration;
 import java.util.Scanner;
 import java.util.concurrent.Semaphore;
 
+import static java.lang.System.exit;
+
 public class ClienteApp {
 
     public static void main(String[] args) throws SocketException {
@@ -61,9 +63,7 @@ public class ClienteApp {
             ObjectOutputStream objOutStr = new ObjectOutputStream(outStr);
             ObjectInputStream objInStr = new ObjectInputStream(inStr);
 
-            Stream stream = new Stream(objOutStr, objInStr);
-
-            Cliente client = new Cliente(user, stream);
+            Cliente client = new Cliente(user);
 
             (new OyenteServidor(client, objOutStr, objInStr)).start();
 
@@ -94,6 +94,9 @@ public class ClienteApp {
             do {
 
                 sem.acquire();
+
+                if (client.isTerminate())
+                    exit(1);
 
                 System.out.println("    ~ MENU ~");
                 System.out.println("1. Get user list");
@@ -169,37 +172,6 @@ public class ClienteApp {
                 }
 
             } while (option != 0);
-
-//            in.close();
-
-//            ObjectInputStream objInStr = new ObjectInputStream(sock.getInputStream());
-//
-//            Fichero file = (Fichero)objInStr.readObject();
-//
-//            System.out.print("Path to file: ");
-//            String filepath = in.nextLine();
-//
-//            PrintWriter writer = new PrintWriter(outStr, true);
-//            BufferedReader reader = new BufferedReader(new InputStreamReader(inStr));
-//
-//            writer.println(filepath);
-//
-//            String text = reader.readLine();
-//
-//            if (text.equals("FILE_NOT_FOUND")) {
-//                System.err.println("ERROR: File " + filepath + " not found");
-//                exit(1);
-//            }
-//
-//            while (text != null) {
-//                System.out.println(text);
-//                text = reader.readLine();
-//            }
-//
-//            outStr.close();
-//            inStr.close();
-//            writer.close();
-//            reader.close();
 
         }
         catch (IOException e) {

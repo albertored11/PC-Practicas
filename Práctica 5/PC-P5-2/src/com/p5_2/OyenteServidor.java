@@ -96,6 +96,24 @@ public class OyenteServidor extends Thread {
 
                         return;
 
+                    case "MENSAJE_USUARIO_REPETIDO":
+
+                        MensajeUsuarioRepetido mur = (MensajeUsuarioRepetido)m;
+
+                        System.err.println("ERROR: El usuario " + mur.getUsername() + " ya existe");
+
+                        _client.terminate();
+
+                        sem.release();
+
+                        return;
+
+                    default:
+
+                        System.err.println("ERROR: (internal) unknown message");
+
+                        break;
+
                 }
 
             }
