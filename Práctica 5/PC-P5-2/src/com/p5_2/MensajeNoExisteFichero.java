@@ -2,7 +2,7 @@ package com.p5_2;
 
 public class MensajeNoExisteFichero extends Mensaje {
 
-    private String _filename;
+    private final String _filename;
 
     public MensajeNoExisteFichero(String filename) {
 

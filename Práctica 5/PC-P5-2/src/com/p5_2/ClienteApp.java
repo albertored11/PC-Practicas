@@ -52,7 +52,9 @@ public class ClienteApp {
         try {
             ni = NetworkInterface.getByName(iface);
         } catch (SocketException e) {
-            e.printStackTrace();
+            System.err.println("ERROR: could not retrieve names of network interfaces");
+            in.close();
+            exit(1);
         }
         Enumeration<InetAddress> en = ni.getInetAddresses();
 
@@ -77,155 +79,197 @@ public class ClienteApp {
         // Crear instancia de usuario
         Usuario user = new Usuario(username, hostname);
 
+        // Crear socket cliente-servidor
+        Socket sock = null;
+
         try {
+            sock = new Socket(server, port);
+        } catch (IOException e) {
+            System.err.println("ERROR: server not found");
+            in.close();
+            exit(1);
+        }
 
-            // Crear socket cliente-servidor
-            Socket sock = new Socket(server, port);
+        // Obtener flujos de entrada y de salida
+        OutputStream outStr = null;
+        InputStream inStr = null;
 
-            // Obtener flujos de entrada y de salida
-            OutputStream outStr = sock.getOutputStream();
-            InputStream inStr = sock.getInputStream();
+        try {
+            outStr = sock.getOutputStream();
+            inStr = sock.getInputStream();
+        } catch (IOException e) {
+            System.err.println("ERROR: I/O error in socket");
+            in.close();
+            exit(1);
+        }
 
-            ObjectOutputStream objOutStr = new ObjectOutputStream(outStr);
-            ObjectInputStream objInStr = new ObjectInputStream(inStr);
+        // Obtener flujos de entrada y de salida para objetos
+        ObjectOutputStream objOutStr = null;
+        ObjectInputStream objInStr = null;
 
-            // Crear instancia de cliente
-            Cliente client = new Cliente(user);
+        try {
+            objOutStr = new ObjectOutputStream(outStr);
+            objInStr = new ObjectInputStream(inStr);
+        } catch (IOException e) {
+            System.err.println("ERROR: I/O error in stream");
+            in.close();
+            exit(1);
+        }
 
-            // Lanzar hilo OyenteServidor para gestionar los mensajes recibidos
-            (new OyenteServidor(client, objOutStr, objInStr)).start();
+        // Crear instancia de cliente
+        Cliente client = new Cliente(user);
 
-            // Leer rutas de ficheros que se pondrán a disposición de los demás clientes
-            System.out.println("Files to share? (end with empty input)");
+        // Lanzar hilo OyenteServidor para gestionar los mensajes recibidos
+        (new OyenteServidor(client, objOutStr, objInStr)).start();
+
+        // Leer rutas de ficheros que se pondrán a disposición de los demás clientes
+        System.out.println("Files to share? (end with empty input)");
+
+        System.out.print("Path to file: ");
+        String filepath = in.nextLine();
+
+        while (!filepath.isEmpty()) {
+
+            user.addFile(filepath);
 
             System.out.print("Path to file: ");
-            String filepath = in.nextLine();
+            filepath = in.nextLine();
 
-            while (!filepath.isEmpty()) {
+        }
 
-                user.addFile(filepath);
+        System.out.println();
 
-                System.out.print("Path to file: ");
-                filepath = in.nextLine();
+        // Enviar MENSAJE_CONEXION
+        Mensaje mc = new MensajeConexion(user);
 
+        try {
+            objOutStr.writeObject(mc);
+        } catch (IOException e) {
+            System.err.println("ERROR: I/O error in stream");
+            in.close();
+            exit(1);
+        }
+
+        Semaphore sem = client.getSem();
+
+        int option;
+
+        do {
+
+            // Post a semáforo: espera a que OyenteServidor haga release antes de volver a mostrar el menú
+            try {
+                sem.acquire();
+            } catch (InterruptedException e) {
+                System.err.println("ERROR: (internal) client stdout semaphore interrupted");
+                in.close();
+                exit(1);
             }
+
+            // Será true si el usuario ya existe, con lo que cerramos la aplicación
+            if (client.isTerminate()) {
+                in.close();
+                exit(1);
+            }
+
+            // Mostrar menú
+            System.out.println("    ~ MENU ~");
+            System.out.println("1. Get user list");
+            System.out.println("2. Request file");
+            System.out.println("0. Exit");
+            System.out.println();
+            System.out.print("Choose an option: ");
+
+            // Leer opción
+            String line = in.nextLine();
 
             System.out.println();
 
-            // Enviar MENSAJE_CONEXION
-            Mensaje mc = new MensajeConexion(user);
+            // Comprobar que la opción es un entero
+            try {
+                option = Integer.parseInt(line);
+            }
+            catch (NumberFormatException e) {
 
-            objOutStr.writeObject(mc);
-
-            Semaphore sem = client.getSem();
-
-            int option;
-
-            do {
-
-                // Post a semáforo: espera a que OyenteServidor haga release antes de volver a mostrar el menú
-                sem.acquire();
-
-                // Será true si el usuario ya existe, con lo que cerramos la aplicación
-                if (client.isTerminate()) {
-
-                    in.close();
-                    outStr.close();
-                    inStr.close();
-                    objOutStr.close();
-                    objInStr.close();
-
-                    exit(1);
-
-                }
-
-                // Mostrar menú
-                System.out.println("    ~ MENU ~");
-                System.out.println("1. Get user list");
-                System.out.println("2. Request file");
-                System.out.println("0. Exit");
-                System.out.println();
-                System.out.print("Choose an option: ");
-
-                // Leer opción
-                String line = in.nextLine();
-
+                System.err.println("ERROR: option must be an integer");
                 System.out.println();
 
-                // Comprobar que la opción es un entero
-                try {
-                    option = Integer.parseInt(line);
-                }
-                catch (NumberFormatException e) {
+                option = -1;
 
-                    System.err.println("ERROR: option must be an integer");
+            }
+
+            switch (option) {
+
+                case 1:
+
+                    // Mandar MENSAJE_LISTA_USUARIOS a OyenteCliente
+                    MensajeListaUsuarios m = new MensajeListaUsuarios(user);
+
+                    try {
+                        objOutStr.writeObject(m);
+                    } catch (IOException e) {
+                        System.err.println("ERROR: I/O error in stream");
+                        in.close();
+                        exit(1);
+                    }
+
+                    break;
+
+                case 2:
+
+                    // Leer ruta del fichero que se quiere obtener
+                    System.out.print("Path to file: ");
+                    String file = in.nextLine();
+
                     System.out.println();
 
-                    option = -1;
+                    // Mandar MENSAJE_PEDIR_FICHERO a OyenteCliente
+                    MensajePedirFichero mpf = new MensajePedirFichero(file, user);
 
-                }
-
-                switch (option) {
-
-                    case 1:
-
-                        // Mandar MENSAJE_LISTA_USUARIOS a OyenteCliente
-                        MensajeListaUsuarios m = new MensajeListaUsuarios(user);
-
-                        objOutStr.writeObject(m);
-
-                        break;
-
-                    case 2:
-
-                        // Leer ruta del fichero que se quiere obtener
-                        System.out.print("Path to file: ");
-                        String file = in.nextLine();
-
-                        System.out.println();
-
-                        // Mandar MENSAJE_PEDIR_FICHERO a OyenteCliente
-                        MensajePedirFichero mpf = new MensajePedirFichero(file, user);
-
+                    try {
                         objOutStr.writeObject(mpf);
+                    } catch (IOException e) {
+                        System.err.println("ERROR: I/O error in stream");
+                        in.close();
+                        exit(1);
+                    }
 
-                        break;
+                    break;
 
-                    case 0:
+                case 0:
 
-                        MensajeCerrarConexion mcc = new MensajeCerrarConexion(user);
+                    // Mandar MENSAJE_CERRAR_CONEXION a OyenteCliente
+                    MensajeCerrarConexion mcc = new MensajeCerrarConexion(user);
 
+                    try {
                         objOutStr.writeObject(mcc);
+                    } catch (IOException e) {
+                        System.err.println("ERROR: I/O error in stream");
+                        in.close();
+                        exit(1);
+                    }
 
-                        break;
+                    break;
 
-                    case -1:
+                case -1:
 
-                        sem.release();
+                    sem.release();
 
-                        break;
+                    break;
 
-                    default:
+                default:
 
-                        System.err.println("ERROR: option " + option + " not valid");
-                        System.out.println();
+                    System.err.println("ERROR: option " + option + " not valid");
+                    System.out.println();
 
-                        sem.release();
+                    sem.release();
 
-                        break;
+                    break;
 
-                }
+            }
 
-            } while (option != 0);
+        } while (option != 0);
 
-        }
-        catch (IOException e) {
-            System.err.println("ERROR: IO exception");
-            e.printStackTrace(); // TODO quitar
-        }
-        catch (Exception e) {
-            e.printStackTrace();
-        }
+        in.close();
 
     }
 
