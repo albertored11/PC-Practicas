@@ -6,9 +6,9 @@ public class MensajeConfirmacionListaUsuarios extends Mensaje {
 
     private final List<Usuario> _userList;
 
-    public MensajeConfirmacionListaUsuarios(String origen, String destino, List<Usuario> userList) {
+    public MensajeConfirmacionListaUsuarios(List<Usuario> userList) {
 
-        super("MENSAJE_CONFIRMACION_LISTA_USUARIOS", origen, destino);
+        super("MENSAJE_CONFIRMACION_LISTA_USUARIOS");
 
         _userList = userList;
 

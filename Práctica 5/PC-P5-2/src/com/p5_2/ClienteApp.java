@@ -83,8 +83,7 @@ public class ClienteApp {
 
             System.out.println();
 
-            // TODO cambiar origen y destino
-            Mensaje mc = new MensajeConexion("Client 1", "Server", user);
+            Mensaje mc = new MensajeConexion(user);
 
             objOutStr.writeObject(mc);
 
@@ -100,6 +99,7 @@ public class ClienteApp {
                 System.out.println("1. Get user list");
                 System.out.println("2. Request file");
                 System.out.println("0. Exit");
+                System.out.println();
                 System.out.print("Choose an option: ");
 
                 option = in.nextInt();
@@ -111,7 +111,7 @@ public class ClienteApp {
 
                     case 1:
 
-                        MensajeListaUsuarios m = new MensajeListaUsuarios("Client 1", "Server", user);
+                        MensajeListaUsuarios m = new MensajeListaUsuarios(user);
 
                         objOutStr.writeObject(m);
 
@@ -124,7 +124,7 @@ public class ClienteApp {
 
                         System.out.println();
 
-                        MensajePedirFichero mpf = new MensajePedirFichero("Client 1", "Server", file, user);
+                        MensajePedirFichero mpf = new MensajePedirFichero(file, user);
 
                         objOutStr.writeObject(mpf);
 
@@ -132,7 +132,7 @@ public class ClienteApp {
 
                     case 0:
 
-                        MensajeCerrarConexion mcc = new MensajeCerrarConexion("Client 1", "Server", user);
+                        MensajeCerrarConexion mcc = new MensajeCerrarConexion(user);
 
                         objOutStr.writeObject(mcc);
 

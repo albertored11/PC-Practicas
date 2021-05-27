@@ -45,7 +45,7 @@ public class OyenteCliente extends Thread {
 
                         _server.addToUserList(user);
 
-                        Mensaje mcc = new MensajeConfirmacionConexion(mc.getDestino(), mc.getOrigen());
+                        Mensaje mcc = new MensajeConfirmacionConexion();
 
                         objOutStr.writeObject(mcc);
 
@@ -53,10 +53,7 @@ public class OyenteCliente extends Thread {
 
                     case "MENSAJE_LISTA_USUARIOS":
 
-                        Mensaje mclu = new MensajeConfirmacionListaUsuarios(
-                                m.getDestino(),
-                                m.getOrigen(),
-                                _server.getUserList());
+                        Mensaje mclu = new MensajeConfirmacionListaUsuarios(_server.getUserList());
 
                         objOutStr.writeObject(mclu);
 
@@ -68,7 +65,7 @@ public class OyenteCliente extends Thread {
 
                         _server.removeFromUserLists(mcco.getUser());
 
-                        Mensaje mccc = new MensajeConfirmacionCerrarConexion(mcco.getDestino(), mcco.getOrigen());
+                        Mensaje mccc = new MensajeConfirmacionCerrarConexion();
 
                         objOutStr.writeObject(mccc);
 
@@ -86,7 +83,7 @@ public class OyenteCliente extends Thread {
                         ObjectOutputStream objOutStr1 = _server.getObjectOutputStream(user1);
                         _server.getSemUserStreamMap().release();
 
-                        MensajeEmitirFichero mef = new MensajeEmitirFichero(mpf.getDestino(), mpf.getOrigen(), file, mpf.getUser());
+                        MensajeEmitirFichero mef = new MensajeEmitirFichero(file, mpf.getUser());
 
                         objOutStr1.writeObject(mef);
 
@@ -109,7 +106,7 @@ public class OyenteCliente extends Thread {
 
                         // TODO: MENSAJE_PREPARADO_SERVIDORCLIENTE debería recibirlo el otro cliente
 
-                        Mensaje mpsc = new MensajePreparadoServidorCliente(mpcs.getDestino(), mpcs.getOrigen(), user, mpcs.getPort());
+                        Mensaje mpsc = new MensajePreparadoServidorCliente(user, mpcs.getPort());
 
                         objOutStr2.writeObject(mpsc);
 

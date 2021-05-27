@@ -4,9 +4,9 @@ public class MensajePedirFichero extends MensajeDesdeCliente {
 
     private final String _file;
 
-    public MensajePedirFichero(String origen, String destino, String filename, Usuario user) {
+    public MensajePedirFichero(String filename, Usuario user) {
 
-        super("MENSAJE_PEDIR_FICHERO", origen, destino, user);
+        super("MENSAJE_PEDIR_FICHERO", user);
 
         _file = filename;
 

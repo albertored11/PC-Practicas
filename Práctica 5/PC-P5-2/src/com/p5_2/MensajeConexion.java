@@ -4,9 +4,9 @@ import java.util.List;
 
 public class MensajeConexion extends MensajeDesdeCliente {
 
-    public MensajeConexion(String origen, String destino, Usuario user) {
+    public MensajeConexion(Usuario user) {
 
-        super("MENSAJE_CONEXION", origen, destino, user);
+        super("MENSAJE_CONEXION", user);
 
     }
 

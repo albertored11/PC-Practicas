@@ -5,9 +5,9 @@ public class MensajeEmitirFichero extends Mensaje {
     private final String _file;
     private final Usuario _destUser;
 
-    public MensajeEmitirFichero(String origen, String destino, String file, Usuario destUser) {
+    public MensajeEmitirFichero(String file, Usuario destUser) {
 
-        super("MENSAJE_EMITIR_FICHERO", origen, destino);
+        super("MENSAJE_EMITIR_FICHERO");
 
         _file = file;
         _destUser = destUser;

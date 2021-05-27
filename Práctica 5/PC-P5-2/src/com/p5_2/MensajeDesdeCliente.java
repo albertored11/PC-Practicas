@@ -4,9 +4,9 @@ public abstract class MensajeDesdeCliente extends Mensaje {
 
     private final Usuario _user;
 
-    public MensajeDesdeCliente(String tipo, String origen, String destino, Usuario user) {
+    public MensajeDesdeCliente(String tipo, Usuario user) {
 
-        super(tipo, origen, destino);
+        super(tipo);
 
         _user = user;
 
