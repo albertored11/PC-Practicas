@@ -102,10 +102,21 @@ public class ClienteApp {
                 System.out.println();
                 System.out.print("Choose an option: ");
 
-                option = in.nextInt();
-                in.nextLine(); // consume \n from int
+                String line = in.nextLine();
 
                 System.out.println();
+
+                try {
+                    option = Integer.parseInt(line);
+                }
+                catch (NumberFormatException e) {
+
+                    System.err.println("ERROR: option must be an integer");
+                    System.out.println();
+
+                    option = -1;
+
+                }
 
                 switch (option) {
 
@@ -135,6 +146,21 @@ public class ClienteApp {
                         MensajeCerrarConexion mcc = new MensajeCerrarConexion(user);
 
                         objOutStr.writeObject(mcc);
+
+                        break;
+
+                    case -1:
+
+                        sem.release();
+
+                        break;
+
+                    default:
+
+                        System.err.println("ERROR: option " + option + " not valid");
+                        System.out.println();
+
+                        sem.release();
 
                         break;
 
