@@ -47,14 +47,24 @@ public class OyenteServidor extends Thread {
 
                         MensajeConfirmacionListaUsuarios mclu = (MensajeConfirmacionListaUsuarios)m;
 
-                        System.out.println("LISTA DE USUARIOS:");
+                        System.out.println("~ USER LIST ~");
+                        System.out.println();
 
                         List<Usuario> userList = mclu.getUserList();
 
-                        for (Usuario user : userList)
+                        for (Usuario user : userList) {
+
                             System.out.println(user);
 
-                        System.out.println();
+                            if (user.getFileList().isEmpty())
+                                System.out.println("    [no files]");
+
+                            for (String file : user.getFileList())
+                                System.out.println("    " + file);
+
+                            System.out.println();
+
+                        }
 
                         sem.release();
 

@@ -12,6 +12,9 @@ public class ClienteApp {
 
         Scanner in = new Scanner(System.in);
 
+        System.out.print("Username: ");
+        String username = in.nextLine();
+
         Enumeration<NetworkInterface> ifaces = NetworkInterface.getNetworkInterfaces();
         StringBuilder sb = new StringBuilder();
 
@@ -36,11 +39,6 @@ public class ClienteApp {
             i = en.nextElement();
 
         String hostname = i.toString().substring(1);
-
-        System.out.println(hostname);
-
-        System.out.print("Username: ");
-        String username = in.nextLine();
 
         System.out.print("Server: ");
         String server = in.nextLine();
