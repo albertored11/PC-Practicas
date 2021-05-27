@@ -5,12 +5,12 @@ public class MensajePreparadoClienteServidor extends MensajeDesdeCliente {
     private final int _port;
     private final Usuario _destUser;
 
-    public MensajePreparadoClienteServidor(Usuario user, Usuario destUser) {
+    public MensajePreparadoClienteServidor(Usuario user, Usuario destUser, int port) {
 
         super("MENSAJE_PREPARADO_CLIENTESERVIDOR", user);
 
-        _port = 30000; // TODO generar puerto
         _destUser = destUser;
+        _port = port;
 
     }
 

@@ -21,6 +21,7 @@ public class Servidor {
     private int _port;
     private ServerSocket _servSock;
     private Semaphore _semUserStreamMap;
+    private int _nextPort;
 
     public Servidor(int port) {
 
@@ -44,6 +45,8 @@ public class Servidor {
         }
 
         _semUserStreamMap = new Semaphore(1);
+
+        _nextPort = 30000;
 
     }
 
@@ -113,6 +116,19 @@ public class Servidor {
                 return u;
 
         return user;
+
+    }
+
+    public int getAndIncrementNextPort() {
+
+        // TODO coger lock
+
+        int ret = _nextPort;
+        _nextPort++;
+
+        // TODO soltar lock
+
+        return ret;
 
     }
 

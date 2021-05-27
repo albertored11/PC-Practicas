@@ -39,11 +39,11 @@ public class OyenteCliente extends Thread {
 
                         Stream stream = new Stream(objOutStr, objInStr);
 
-                        _server.getSemUserStreamMap().acquire();
+                        _server.getSemUserStreamMap().acquire(); // TODO proteger con monitores
                         _server.putInUserStreamMap(user, stream);
                         _server.getSemUserStreamMap().release();
 
-                        _server.addToUserList(user);
+                        _server.addToUserList(user); // TODO proteger lista con monitores
 
                         Mensaje mcc = new MensajeConfirmacionConexion();
 
@@ -61,7 +61,7 @@ public class OyenteCliente extends Thread {
 
                     case "MENSAJE_CERRAR_CONEXION":
 
-                        MensajeCerrarConexion mcco = (MensajeCerrarConexion) m;
+                        MensajeCerrarConexion mcco = (MensajeCerrarConexion)m;
 
                         _server.removeFromUserLists(mcco.getUser());
 
@@ -83,7 +83,7 @@ public class OyenteCliente extends Thread {
                         ObjectOutputStream objOutStr1 = _server.getObjectOutputStream(user1);
                         _server.getSemUserStreamMap().release();
 
-                        MensajeEmitirFichero mef = new MensajeEmitirFichero(file, mpf.getUser());
+                        MensajeEmitirFichero mef = new MensajeEmitirFichero(file, mpf.getUser(), _server.getAndIncrementNextPort());
 
                         objOutStr1.writeObject(mef);
 
@@ -92,7 +92,7 @@ public class OyenteCliente extends Thread {
                     case "MENSAJE_PREPARADO_CLIENTESERVIDOR":
 
                         if (user == null) {
-                            System.err.println("INTERNAL ERROR: user info not found");
+                            System.err.println("ERROR: (internal) user info not found");
                             break;
                         }
 
@@ -104,8 +104,6 @@ public class OyenteCliente extends Thread {
                         ObjectOutputStream objOutStr2 = _server.getObjectOutputStream(destUser);
                         _server.getSemUserStreamMap().release();
 
-                        // TODO: MENSAJE_PREPARADO_SERVIDORCLIENTE debería recibirlo el otro cliente
-
                         Mensaje mpsc = new MensajePreparadoServidorCliente(user, mpcs.getPort());
 
                         objOutStr2.writeObject(mpsc);
@@ -114,7 +112,7 @@ public class OyenteCliente extends Thread {
 
                     default:
 
-                        System.err.println("INTERNAL ERROR: unknown message");
+                        System.err.println("ERROR: (internal) unknown message");
 
                         break;
 

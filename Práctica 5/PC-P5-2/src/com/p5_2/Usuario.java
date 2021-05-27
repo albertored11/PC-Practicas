@@ -16,7 +16,7 @@ public class Usuario implements Serializable {
 //        _id = id;
         _name = name;
         _inetAddress = inetAddress;
-        _fileList = new ArrayList<String>();
+        _fileList = new ArrayList<>();
 
     }
 
