@@ -90,11 +90,11 @@ public class Servidor {
 
     }
 
-    public Usuario getFileUser(Fichero filename) {
+    public Usuario getFileUser(String filename) {
 
         for (Usuario user : _userList)
-            for (Fichero file : user.getFileList())
-                if (file.getFilePath().equals(filename.getFilePath()))
+            for (String file : user.getFileList())
+                if (file.equals(filename))
                     return user;
 
         return null;

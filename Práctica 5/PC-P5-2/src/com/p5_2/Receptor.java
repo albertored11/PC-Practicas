@@ -27,7 +27,9 @@ public class Receptor extends Thread {
             InputStream inStr = sock.getInputStream();
             ObjectInputStream objInStr = new ObjectInputStream(inStr);
 
-            Fichero file = (Fichero)objInStr.readObject();
+            String file = (String)objInStr.readObject();
+
+            // TODO save String to file
 
             System.out.println(file);
 

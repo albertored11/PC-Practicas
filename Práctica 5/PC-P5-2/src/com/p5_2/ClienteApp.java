@@ -54,7 +54,7 @@ public class ClienteApp {
 
             while (!filepath.isEmpty()) {
 
-                user.addFile(new Fichero(filepath));
+                user.addFile(filepath);
 
                 System.out.print("Path to file: ");
                 filepath = in.nextLine();
@@ -100,7 +100,7 @@ public class ClienteApp {
                     case 2:
 
                         System.out.print("Path to file: ");
-                        Fichero file = new Fichero(in.nextLine());
+                        String file = in.nextLine();
 
                         MensajePedirFichero mpf = new MensajePedirFichero("Client 1", "Server", file, user);
 

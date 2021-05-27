@@ -2,10 +2,10 @@ package com.p5_2;
 
 public class MensajeEmitirFichero extends Mensaje {
 
-    private final Fichero _file;
+    private final String _file;
     private final Usuario _destUser;
 
-    public MensajeEmitirFichero(String origen, String destino, Fichero file, Usuario destUser) {
+    public MensajeEmitirFichero(String origen, String destino, String file, Usuario destUser) {
 
         super("MENSAJE_EMITIR_FICHERO", origen, destino);
 
@@ -14,7 +14,7 @@ public class MensajeEmitirFichero extends Mensaje {
 
     }
 
-    public Fichero getFile() {
+    public String getFile() {
         return _file;
     }
 

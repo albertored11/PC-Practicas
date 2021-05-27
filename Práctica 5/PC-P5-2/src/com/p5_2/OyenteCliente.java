@@ -82,7 +82,7 @@ public class OyenteCliente extends Thread {
 
                         System.out.println("MENSAJE_PEDIR_FICHERO recibido!");
 
-                        Fichero file = mpf.getFile();
+                        String file = mpf.getFile();
 
                         Usuario user1 = _server.getFileUser(file);
 
