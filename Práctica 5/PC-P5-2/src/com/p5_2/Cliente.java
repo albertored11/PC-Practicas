@@ -4,9 +4,9 @@ import java.util.concurrent.Semaphore;
 
 public class Cliente {
 
-    private Usuario _user;
-    private Stream _serverStream;
-    private Semaphore _sem;
+    private final Usuario _user;
+    private final Stream _serverStream;
+    private final Semaphore _sem;
 
     public Cliente(Usuario user, Stream serverStream) {
 

@@ -1,21 +1,43 @@
 package com.p5_2;
 
 import java.io.*;
-import java.net.InetAddress;
-import java.net.Socket;
-import java.net.UnknownHostException;
+import java.net.*;
+import java.util.Enumeration;
 import java.util.Scanner;
 import java.util.concurrent.Semaphore;
 
-import static java.lang.System.exit;
-
 public class ClienteApp {
 
-    public static void main(String[] args) throws UnknownHostException {
+    public static void main(String[] args) throws SocketException {
 
         Scanner in = new Scanner(System.in);
 
-        String hostname = "localhost";
+        Enumeration<NetworkInterface> ifaces = NetworkInterface.getNetworkInterfaces();
+        StringBuilder sb = new StringBuilder();
+
+        if (ifaces.hasMoreElements())
+            sb.append(ifaces.nextElement().getDisplayName());
+
+        while (ifaces.hasMoreElements()) {
+            sb.append(", ");
+            sb.append(ifaces.nextElement().getDisplayName());
+        }
+
+        System.out.print("Network interface (" + sb + "): ");
+
+        String iface = in.nextLine();
+
+        NetworkInterface ni = NetworkInterface.getByName(iface);
+        Enumeration<InetAddress> en = ni.getInetAddresses();
+
+        InetAddress i = en.nextElement();
+
+        while (i.getClass() != Inet4Address.class)
+            i = en.nextElement();
+
+        String hostname = i.toString().substring(1);
+
+        System.out.println(hostname);
 
         System.out.print("Username: ");
         String username = in.nextLine();
