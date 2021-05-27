@@ -22,7 +22,6 @@ public class Servidor {
     private String _inetAddress;
     private final int _port;
     private ServerSocket _servSock;
-    private final Semaphore _semUserStreamMap;
     private int _nextPort;
     private final ReadersWritersController _userStreamMapController;
     private final ReadersWritersController _userListController;
@@ -47,8 +46,6 @@ public class Servidor {
             System.err.println("ERROR: IO exception");
             exit(1);
         }
-
-        _semUserStreamMap = new Semaphore(1);
 
         _nextPort = 30000;
 
@@ -148,10 +145,6 @@ public class Servidor {
 
         return null;
 
-    }
-
-    public Semaphore getSemUserStreamMap() {
-        return _semUserStreamMap;
     }
 
     // Get original reference for a username; returns itself it not found

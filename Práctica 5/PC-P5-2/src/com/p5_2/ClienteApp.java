@@ -130,6 +130,8 @@ public class ClienteApp {
 
                     case 2:
 
+                        // TODO si nadie lo tiene, error
+
                         System.out.print("Path to file: ");
                         String file = in.nextLine();
 

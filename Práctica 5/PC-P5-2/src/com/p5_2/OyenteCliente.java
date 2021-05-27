@@ -39,9 +39,7 @@ public class OyenteCliente extends Thread {
 
                         Stream stream = new Stream(objOutStr, objInStr);
 
-                        _server.getSemUserStreamMap().acquire(); // TODO proteger con monitores
                         _server.putInUserStreamMap(user, stream);
-                        _server.getSemUserStreamMap().release();
 
                         _server.addToUserList(user); // TODO proteger lista con monitores
 
@@ -80,9 +78,7 @@ public class OyenteCliente extends Thread {
 
                         Usuario user1 = _server.getFileUser(file);
 
-                        _server.getSemUserStreamMap().acquire();
                         ObjectOutputStream objOutStr1 = _server.getObjectOutputStream(user1);
-                        _server.getSemUserStreamMap().release();
 
                         MensajeEmitirFichero mef = new MensajeEmitirFichero(file, mpf.getUser(), _server.getAndIncrementNextPort());
 
@@ -101,9 +97,7 @@ public class OyenteCliente extends Thread {
 
                         Usuario destUser = _server.getOriginalUser(mpcs.getDestUser());
 
-                        _server.getSemUserStreamMap().acquire();
                         ObjectOutputStream objOutStr2 = _server.getObjectOutputStream(destUser);
-                        _server.getSemUserStreamMap().release();
 
                         Mensaje mpsc = new MensajePreparadoServidorCliente(user, mpcs.getPort());
 
