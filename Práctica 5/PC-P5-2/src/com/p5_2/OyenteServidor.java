@@ -36,7 +36,7 @@ public class OyenteServidor extends Thread {
 
                     case "MENSAJE_CONFIRMACION_CONEXION":
 
-                        System.out.println("Conexión establecida");
+                        System.out.println("Connection established");
                         System.out.println();
 
                         sem.release();
@@ -92,7 +92,7 @@ public class OyenteServidor extends Thread {
 
                     case "MENSAJE_CONFIRMACION_CERRAR_CONEXION":
 
-                        System.out.println("Conexión terminada");
+                        System.out.println("Connection closed");
 
                         return;
 
@@ -100,7 +100,7 @@ public class OyenteServidor extends Thread {
 
                         MensajeUsuarioRepetido mur = (MensajeUsuarioRepetido)m;
 
-                        System.err.println("ERROR: el usuario " + mur.getUsername() + " ya existe");
+                        System.err.println("ERROR: user " + mur.getUsername() + " already exists");
 
                         _client.terminate();
 
@@ -112,7 +112,7 @@ public class OyenteServidor extends Thread {
 
                         MensajeNoExisteFichero mnef = (MensajeNoExisteFichero)m;
 
-                        System.err.println("ERROR: el fichero " + mnef.getFilename() + " no está disponible");
+                        System.err.println("ERROR: file " + mnef.getFilename() + " is not available");
                         System.out.println();
 
                         sem.release();

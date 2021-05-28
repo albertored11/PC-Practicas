@@ -6,8 +6,6 @@ import java.net.Socket;
 
 public class Emisor extends Thread {
 
-    // TODO si hay un error aquí, Receptor se queda colgado
-
     private final String _file;
     private final int _port;
 
@@ -69,8 +67,15 @@ public class Emisor extends Thread {
         try {
             fileReader = new FileReader(file);
         } catch (FileNotFoundException e) {
-            System.err.println("ERROR: file " + _file + " not found");
+
+            try {
+                objOutStr.writeObject("ERROR: file " + _file + " not found\n");
+            } catch (IOException ioException) {
+                System.err.println("ERROR: I/O error in stream");
+            }
+
             return;
+
         }
 
         BufferedReader bufReader = new BufferedReader(fileReader);
@@ -97,8 +102,15 @@ public class Emisor extends Thread {
             try {
                 text = bufReader.readLine();
             } catch (IOException e) {
-                System.err.println("ERROR: I/O error in buffer");
+
+                try {
+                    objOutStr.writeObject("ERROR: I/O error in buffer\n");
+                } catch (IOException ioException) {
+                    System.err.println("ERROR: I/O error in stream");
+                }
+
                 return;
+
             }
 
         }
