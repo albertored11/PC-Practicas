@@ -25,8 +25,6 @@ public class ServidorApp {
 
         while (true) {
 
-            System.out.println("Waiting for clients...");
-
             Socket sock = null;
 
             try {

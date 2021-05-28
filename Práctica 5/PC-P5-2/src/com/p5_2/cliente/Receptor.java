@@ -101,8 +101,8 @@ public class Receptor extends Thread {
         out.print(file);
         out.close();
 
-        // Escribir en stdout
-        System.out.println(file);
+        System.out.println("File saved to " + System.getProperty("user.dir") + "/" + filename);
+        System.out.println();
 
         _sem.release(); // release a semáforo
 

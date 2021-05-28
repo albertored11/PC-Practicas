@@ -29,6 +29,9 @@ public class OyenteServidor extends Thread {
 
         while (true) {
 
+            // Semáforo para controlar el flujo de stdout del cliente
+            Semaphore sem = _client.getSem();
+
             // Leer mensaje
             Mensaje m;
 
@@ -36,14 +39,15 @@ public class OyenteServidor extends Thread {
                 m = (Mensaje)_objInStr.readObject();
             } catch (IOException e) {
                 System.err.println("ERROR: I/O error in stream");
+                _client.terminate(); // decirle al cliente que termine
+                sem.release(); // release a semáforo
                 return;
             } catch (ClassNotFoundException e) {
                 System.err.println("ERROR: (internal) wrong message class");
+                _client.terminate(); // decirle al cliente que termine
+                sem.release(); // release a semáforo
                 return;
             }
-
-            // Semáforo para controlar el flujo de stdout del cliente
-            Semaphore sem = _client.getSem();
 
             switch (m.getTipo()) {
 
@@ -95,6 +99,8 @@ public class OyenteServidor extends Thread {
                         _objOutStr.writeObject(mpcs);
                     } catch (IOException e) {
                         System.err.println("ERROR: I/O error in stream");
+                        _client.terminate(); // decirle al cliente que termine
+                        sem.release(); // release a semáforo
                         return;
                     }
 

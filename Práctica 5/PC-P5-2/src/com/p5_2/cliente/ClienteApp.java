@@ -62,6 +62,13 @@ public class ClienteApp {
             in.close();
             exit(1);
         }
+
+        if (ni == null) {
+            System.err.println("ERROR: network interface not found");
+            in.close();
+            exit(1);
+        }
+
         Enumeration<InetAddress> en = ni.getInetAddresses();
 
         InetAddress i = en.nextElement();
