@@ -16,7 +16,7 @@ import static java.lang.System.exit;
 
 public class Servidor {
 
-    private final Map<Usuario, Stream> _userStreamMap; // mapa usuarios con object streams cliente-servidor
+    private final Map<Usuario, ObjectOutputStream> _userStreamMap; // mapa usuarios con object streams cliente-servidor
     private final List<Usuario> _userList; // lista de usuarios
     private ServerSocket _servSock; // server socket para aceptar conexiones entrantes
     private int _nextPort; // puerto que se asignará a la siguiente comunicación P2P
@@ -52,7 +52,7 @@ public class Servidor {
 
         _userStreamMapController.requestRead();
 
-        ObjectOutputStream ret = _userStreamMap.get(user).getObjOutStr();
+        ObjectOutputStream ret = _userStreamMap.get(user);
 
         _userStreamMapController.releaseRead();
 
@@ -80,7 +80,7 @@ public class Servidor {
     }
 
     // Añadir usuario y flujos para objetos al mapa
-    public void putInUserStreamMap(Usuario user, Stream stream) {
+    public void putInUserStreamMap(Usuario user, ObjectOutputStream stream) {
 
         _userStreamMapController.requestWrite();
 

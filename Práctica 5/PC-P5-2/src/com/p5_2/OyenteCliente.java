@@ -72,9 +72,7 @@ public class OyenteCliente extends Thread {
                     }
 
                     // Añadir usuario a las tablas del servidor
-                    Stream stream = new Stream(objOutStr, objInStr);
-
-                    _server.putInUserStreamMap(user, stream);
+                    _server.putInUserStreamMap(user, objOutStr);
 
                     _server.addToUserList(user);
 

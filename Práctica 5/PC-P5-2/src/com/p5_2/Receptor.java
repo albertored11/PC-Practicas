@@ -28,6 +28,7 @@ public class Receptor extends Thread {
             sock = new Socket(_emisor.getInetAddress(), _port);
         } catch (IOException e) {
             System.err.println("ERROR: server not found");
+            _sem.release(); // release a semáforo
             return;
         }
 
@@ -38,6 +39,7 @@ public class Receptor extends Thread {
             inStr = sock.getInputStream();
         } catch (IOException e) {
             System.err.println("ERROR: I/O error in socket");
+            _sem.release(); // release a semáforo
             return;
         }
 
@@ -47,6 +49,7 @@ public class Receptor extends Thread {
             objInStr = new ObjectInputStream(inStr);
         } catch (IOException e) {
             System.err.println("ERROR: I/O error in stream");
+            _sem.release(); // release a semáforo
             return;
         }
 
@@ -55,9 +58,11 @@ public class Receptor extends Thread {
             file = (String)objInStr.readObject();
         } catch (IOException e) {
             System.err.println("ERROR: I/O error in stream");
+            _sem.release(); // release a semáforo
             return;
         } catch (ClassNotFoundException e) {
             System.err.println("ERROR: (internal) wrong message class");
+            _sem.release(); // release a semáforo
             return;
         }
 
