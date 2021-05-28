@@ -4,7 +4,7 @@ import java.io.Serializable;
 
 public abstract class Mensaje implements Serializable {
 
-    private final String _tipo;
+    private final String _tipo; // String único para cada tipo de mensaje que lo identifiac
 
     public Mensaje(String tipo) {
 

@@ -2,8 +2,8 @@ package com.p5_2;
 
 public class MensajePreparadoClienteServidor extends MensajeDesdeCliente {
 
-    private final int _port;
-    private final Usuario _destUser;
+    private final int _port; // puerto del socket entre emisor y receptor
+    private final Usuario _destUser; // usuario receptor
 
     public MensajePreparadoClienteServidor(Usuario user, Usuario destUser, int port) {
 

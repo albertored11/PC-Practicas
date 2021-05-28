@@ -1,5 +1,6 @@
 package com.p5_2;
 
+import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.util.List;
@@ -7,9 +8,9 @@ import java.util.concurrent.Semaphore;
 
 public class OyenteServidor extends Thread {
 
-    private final Cliente _client;
-    private final ObjectOutputStream _objOutStr;
-    private final ObjectInputStream _objInStr;
+    private final Cliente _client; // cliente
+    private final ObjectOutputStream _objOutStr; // flujo de salida hacia el servidor
+    private final ObjectInputStream _objInStr; // flujo de entrada desde el servidor
 
     public OyenteServidor(Cliente client, ObjectOutputStream objOutStr, ObjectInputStream objInStr) {
 
@@ -21,113 +22,130 @@ public class OyenteServidor extends Thread {
 
     @Override
     public void run() {
-        
-        try { // TODO tratar excepciones
 
-            while (true) {
+        while (true) {
 
-                Mensaje m = (Mensaje)_objInStr.readObject();
+            // Leer mensaje
+            Mensaje m;
 
-                Semaphore sem = _client.getSem();
+            try {
+                m = (Mensaje)_objInStr.readObject();
+            } catch (IOException e) {
+                System.err.println("ERROR: I/O error in stream");
+                return;
+            } catch (ClassNotFoundException e) {
+                System.err.println("ERROR: (internal) wrong message class");
+                return;
+            }
 
-                switch (m.getTipo()) {
+            // Semáforo para controlar el flujo de stdout del cliente
+            Semaphore sem = _client.getSem();
 
-                    case "MENSAJE_CONFIRMACION_CONEXION":
+            switch (m.getTipo()) {
 
-                        System.out.println("Connection established");
+                case "MENSAJE_CONFIRMACION_CONEXION":
+
+                    System.out.println("Connection established");
+                    System.out.println();
+
+                    sem.release(); // release a semáforo
+
+                    break;
+
+                case "MENSAJE_CONFIRMACION_LISTA_USUARIOS":
+
+                    MensajeConfirmacionListaUsuarios mclu = (MensajeConfirmacionListaUsuarios)m;
+
+                    // Mostrar lista de usuarios y ficheros
+                    System.out.println("~ USER LIST ~");
+                    System.out.println();
+
+                    List<Usuario> userList = mclu.getUserList();
+
+                    for (Usuario user : userList) {
+
+                        System.out.println(user);
+
+                        if (user.getFileList().isEmpty())
+                            System.out.println("    [no files]");
+
+                        for (Fichero file : user.getFileList())
+                            System.out.println("    " + file);
+
                         System.out.println();
 
-                        sem.release();
+                    }
 
-                        break;
+                    sem.release(); // release a semáforo
 
-                    case "MENSAJE_CONFIRMACION_LISTA_USUARIOS":
+                    break;
 
-                        MensajeConfirmacionListaUsuarios mclu = (MensajeConfirmacionListaUsuarios)m;
+                case "MENSAJE_EMITIR_FICHERO":
 
-                        System.out.println("~ USER LIST ~");
-                        System.out.println();
+                    MensajeEmitirFichero mef = (MensajeEmitirFichero)m;
 
-                        List<Usuario> userList = mclu.getUserList();
+                    // Mandar MENSAJE_PREPARADO_CLIENTESERVIDOR a OyenteCliente
+                    MensajePreparadoClienteServidor mpcs = new MensajePreparadoClienteServidor(_client.getUser(), mef.getDestUser(), mef.getPort());
 
-                        for (Usuario user : userList) {
-
-                            System.out.println(user);
-
-                            if (user.getFileList().isEmpty())
-                                System.out.println("    [no files]");
-
-                            for (Fichero file : user.getFileList())
-                                System.out.println("    " + file);
-
-                            System.out.println();
-
-                        }
-
-                        sem.release();
-
-                        break;
-
-                    case "MENSAJE_EMITIR_FICHERO":
-
-                        MensajeEmitirFichero mef = (MensajeEmitirFichero)m;
-
-                        MensajePreparadoClienteServidor mpcs = new MensajePreparadoClienteServidor(_client.getUser(), mef.getDestUser(), mef.getPort());
-
+                    try {
                         _objOutStr.writeObject(mpcs);
-
-                        (new Emisor(mef.getFile(), mef.getPort())).start();
-
-                        break;
-
-                    case "MENSAJE_PREPARADO_SERVIDORCLIENTE":
-
-                        MensajePreparadoServidorCliente mpsc = (MensajePreparadoServidorCliente)m;
-
-                        (new Receptor(mpsc.getUser(), mpsc.getPort(), sem)).start();
-
-                        break;
-
-                    case "MENSAJE_CONFIRMACION_CERRAR_CONEXION":
-
-                        System.out.println("Connection closed");
-
+                    } catch (IOException e) {
+                        System.err.println("ERROR: I/O error in stream");
                         return;
+                    }
 
-                    case "MENSAJE_USUARIO_REPETIDO":
+                    // Crear hilo emisor
+                    (new Emisor(mef.getFile(), mef.getPort())).start();
 
-                        MensajeUsuarioRepetido mur = (MensajeUsuarioRepetido)m;
+                    break;
 
-                        System.err.println("ERROR: user " + mur.getUsername() + " already exists");
+                case "MENSAJE_PREPARADO_SERVIDORCLIENTE":
 
-                        _client.terminate();
+                    MensajePreparadoServidorCliente mpsc = (MensajePreparadoServidorCliente)m;
 
-                        sem.release();
+                    // Crear hilo receptor
+                    (new Receptor(mpsc.getUser(), mpsc.getPort(), sem)).start();
 
-                        return;
+                    break;
 
-                    case "MENSAJE_NO_EXISTE_FICHERO":
+                case "MENSAJE_CONFIRMACION_CERRAR_CONEXION":
 
-                        MensajeNoExisteFichero mnef = (MensajeNoExisteFichero)m;
+                    System.out.println("Connection closed");
 
-                        System.err.println("ERROR: file " + mnef.getFilename() + " is not available");
-                        System.out.println();
+                    return;
 
-                        sem.release();
+                case "MENSAJE_USUARIO_REPETIDO":
 
-                        break;
+                    MensajeUsuarioRepetido mur = (MensajeUsuarioRepetido)m;
 
-                    default:
+                    System.err.println("ERROR: user " + mur.getUsername() + " already exists");
 
-                        System.err.println("ERROR: (internal) unknown message");
+                    _client.terminate(); // decirle al cliente que termine
 
-                        break;
+                    sem.release(); // release a semáforo
 
-                }
+                    return;
+
+                case "MENSAJE_NO_EXISTE_FICHERO":
+
+                    MensajeNoExisteFichero mnef = (MensajeNoExisteFichero)m;
+
+                    System.err.println("ERROR: file " + mnef.getFilename() + " is not available");
+                    System.out.println();
+
+                    sem.release(); // release a semáforo
+
+                    break;
+
+                default:
+
+                    System.err.println("ERROR: (internal) unknown message");
+
+                    return;
 
             }
 
-        } catch (Exception e) {}
+        }
 
     }
 

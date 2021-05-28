@@ -17,4 +17,5 @@ public class MensajeConfirmacionListaUsuarios extends Mensaje {
     public List<Usuario> getUserList() {
         return _userList;
     }
+
 }

@@ -28,7 +28,6 @@ public class ServidorApp {
                 Socket sock = server.getServSock().accept();
 
                 System.out.println("Client connected from " + sock.getInetAddress().toString().substring(1));
-                System.out.println();
 
                 OutputStream outStr = sock.getOutputStream();
                 InputStream inStr = sock.getInputStream();

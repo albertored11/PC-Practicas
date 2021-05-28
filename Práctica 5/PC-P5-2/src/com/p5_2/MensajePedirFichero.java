@@ -2,7 +2,7 @@ package com.p5_2;
 
 public class MensajePedirFichero extends MensajeDesdeCliente {
 
-    private final String _filename;
+    private final String _filename; // nombre del fichero
 
     public MensajePedirFichero(String filename, Usuario user) {
 

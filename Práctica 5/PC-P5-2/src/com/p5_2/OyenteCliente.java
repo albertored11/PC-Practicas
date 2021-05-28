@@ -4,9 +4,9 @@ import java.io.*;
 
 public class OyenteCliente extends Thread {
 
-    private final Servidor _server;
-    private final OutputStream _outStr;
-    private final InputStream _inStr;
+    private final Servidor _server; // servidor
+    private final OutputStream _outStr; // flujo de salida hacia el cliente
+    private final InputStream _inStr; // flujo de entrada desde el cliente
 
     public OyenteCliente(Servidor server, OutputStream outStr, InputStream inStr) {
 
@@ -19,123 +19,191 @@ public class OyenteCliente extends Thread {
     @Override
     public void run() {
 
-        try { // TODO tratar excepciones
+        // Obtener flujos de entrada y de salida para objetos
+        ObjectOutputStream objOutStr;
+        ObjectInputStream objInStr;
 
-            ObjectInputStream objInStr = new ObjectInputStream(_inStr);
-            ObjectOutputStream objOutStr = new ObjectOutputStream(_outStr);
+        try {
+            objOutStr = new ObjectOutputStream(_outStr);
+            objInStr = new ObjectInputStream(_inStr);
+        } catch (IOException e) {
+            System.err.println("ERROR: I/O error in stream");
+            return;
+        }
 
-            Usuario user = null;
+        Usuario user = null;
 
-            while (true) {
+        while (true) {
 
-                Mensaje m = (Mensaje)objInStr.readObject();
+            // Leer mensaje
+            Mensaje m;
 
-                switch (m.getTipo()) {
+            try {
+                m = (Mensaje)objInStr.readObject();
+            } catch (IOException e) {
+                System.err.println("ERROR: I/O error in stream");
+                return;
+            } catch (ClassNotFoundException e) {
+                System.err.println("ERROR: (internal) wrong message class");
+                return;
+            }
 
-                    case "MENSAJE_CONEXION":
+            switch (m.getTipo()) {
 
-                        MensajeConexion mc = (MensajeConexion)m;
-                        user = mc.getUser();
+                case "MENSAJE_CONEXION":
 
-                        if (_server.hasUser(user.toString())) {
+                    MensajeConexion mc = (MensajeConexion)m;
+                    user = mc.getUser();
 
-                            Mensaje mur = new MensajeUsuarioRepetido(user.toString());
+                    // Si el usuario ya existe, mandar MENSAJE_USUARIO_REPETIDO a OyenteServidor
+                    if (_server.hasUser(user.toString())) {
 
+                        Mensaje mur = new MensajeUsuarioRepetido(user.toString());
+
+                        try {
                             objOutStr.writeObject(mur);
-
-                            break;
-
+                        } catch (IOException e) {
+                            System.err.println("ERROR: I/O error in stream");
+                            return;
                         }
 
-                        Stream stream = new Stream(objOutStr, objInStr);
+                        break;
 
-                        _server.putInUserStreamMap(user, stream);
+                    }
 
-                        _server.addToUserList(user);
+                    // Añadir usuario a las tablas del servidor
+                    Stream stream = new Stream(objOutStr, objInStr);
 
-                        Mensaje mcc = new MensajeConfirmacionConexion();
+                    _server.putInUserStreamMap(user, stream);
 
+                    _server.addToUserList(user);
+
+                    // Mandar MENSAJE_CONFIRMACION_CONEXION a OyenteServidor
+                    Mensaje mcc = new MensajeConfirmacionConexion();
+
+                    try {
                         objOutStr.writeObject(mcc);
+                    } catch (IOException e) {
+                        System.err.println("ERROR: I/O error in stream");
+                        return;
+                    }
 
-                        break;
+                    break;
 
-                    case "MENSAJE_LISTA_USUARIOS":
+                case "MENSAJE_LISTA_USUARIOS":
 
-                        Mensaje mclu = new MensajeConfirmacionListaUsuarios(_server.getUserList());
+                    // Mandar MENSAJE_CONFIRMACION_LISTA_USUARIOS a OyenteServidor
+                    Mensaje mclu = new MensajeConfirmacionListaUsuarios(_server.getUserList());
 
+                    // Si no hacemos un reset en el flujo de salida para objetos, obtendremos siempre la misma lista
+                    try {
                         objOutStr.reset();
+                    } catch (IOException e) {
+                        System.err.println("ERROR: I/O error in stream");
+                        return;
+                    }
+
+                    try {
                         objOutStr.writeObject(mclu);
+                    } catch (IOException e) {
+                        System.err.println("ERROR: I/O error in stream");
+                        return;
+                    }
 
-                        break;
+                    break;
 
-                    case "MENSAJE_CERRAR_CONEXION":
+                case "MENSAJE_CERRAR_CONEXION":
 
-                        MensajeCerrarConexion mcco = (MensajeCerrarConexion)m;
+                    MensajeCerrarConexion mcco = (MensajeCerrarConexion)m;
 
-                        _server.removeFromUserLists(mcco.getUser());
+                    // Eliminar al usuario de las tablas del servidor
+                    _server.removeFromUserLists(mcco.getUser());
 
-                        Mensaje mccc = new MensajeConfirmacionCerrarConexion();
+                    // Mandar MENSAJE_CONFIRMACION_CERRAR_CONEXION a OyenteServidor
+                    Mensaje mccc = new MensajeConfirmacionCerrarConexion();
 
+                    try {
                         objOutStr.writeObject(mccc);
+                    } catch (IOException e) {
+                        System.err.println("ERROR: I/O error in stream");
+                        return;
+                    }
 
-                        break;
+                    return;
 
-                    case "MENSAJE_PEDIR_FICHERO":
+                case "MENSAJE_PEDIR_FICHERO":
 
-                        MensajePedirFichero mpf = (MensajePedirFichero)m;
+                    MensajePedirFichero mpf = (MensajePedirFichero)m;
 
-                        String filename = mpf.getFile();
+                    String filename = mpf.getFile();
 
-                        Fichero file = _server.getFileFromFilename(filename);
+                    Fichero file = _server.getFileFromFilename(filename);
 
-                        if (file == null) {
+                    // Si el fichero no existe, mandar MENSAJE_CONFIRMACION_CONEXION a OyenteServidor
+                    if (file == null) {
 
-                            MensajeNoExisteFichero mnef = new MensajeNoExisteFichero(filename);
+                        MensajeNoExisteFichero mnef = new MensajeNoExisteFichero(filename);
 
+                        try {
                             objOutStr.writeObject(mnef);
-
-                            break;
-
+                        } catch (IOException e) {
+                            System.err.println("ERROR: I/O error in stream");
+                            return;
                         }
 
-                        ObjectOutputStream objOutStr1 = _server.getObjectOutputStream(file.getUser());
+                        break;
 
-                        MensajeEmitirFichero mef = new MensajeEmitirFichero(file, mpf.getUser(), _server.getAndIncrementNextPort());
+                    }
 
+                    // Mandar MENSAJE_EMITIR_FICHERO a OyenteServidor
+                    ObjectOutputStream objOutStr1 = _server.getObjectOutputStream(file.getUser());
+
+                    MensajeEmitirFichero mef = new MensajeEmitirFichero(file, mpf.getUser(), _server.getAndIncrementNextPort());
+
+                    try {
                         objOutStr1.writeObject(mef);
+                    } catch (IOException e) {
+                        System.err.println("ERROR: I/O error in stream");
+                        return;
+                    }
 
+                    break;
+
+                case "MENSAJE_PREPARADO_CLIENTESERVIDOR":
+
+                    if (user == null) {
+                        System.err.println("ERROR: (internal) user info not found");
                         break;
+                    }
 
-                    case "MENSAJE_PREPARADO_CLIENTESERVIDOR":
+                    MensajePreparadoClienteServidor mpcs = (MensajePreparadoClienteServidor)m;
 
-                        if (user == null) {
-                            System.err.println("ERROR: (internal) user info not found");
-                            break;
-                        }
+                    // Obtener usuario receptor
+                    Usuario destUser = _server.getOriginalUser(mpcs.getDestUser());
 
-                        MensajePreparadoClienteServidor mpcs = (MensajePreparadoClienteServidor)m;
+                    // Mandar MENSAJE_PREPARADO_SERVIDORCLIENTE a OyenteServidor
+                    ObjectOutputStream objOutStr2 = _server.getObjectOutputStream(destUser);
 
-                        Usuario destUser = _server.getOriginalUser(mpcs.getDestUser());
+                    Mensaje mpsc = new MensajePreparadoServidorCliente(user, mpcs.getPort());
 
-                        ObjectOutputStream objOutStr2 = _server.getObjectOutputStream(destUser);
-
-                        Mensaje mpsc = new MensajePreparadoServidorCliente(user, mpcs.getPort());
-
+                    try {
                         objOutStr2.writeObject(mpsc);
+                    } catch (IOException e) {
+                        System.err.println("ERROR: I/O error in stream");
+                        return;
+                    }
 
-                        break;
+                    break;
 
-                    default:
+                default:
 
-                        System.err.println("ERROR: (internal) unknown message");
+                    System.err.println("ERROR: (internal) unknown message");
 
-                        break;
-
-                }
+                    return;
 
             }
 
-        } catch (Exception e) {}
+        }
 
     }
 

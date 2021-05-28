@@ -2,7 +2,7 @@ package com.p5_2;
 
 public class MensajeNoExisteFichero extends Mensaje {
 
-    private final String _filename;
+    private final String _filename; // nombre del fichero
 
     public MensajeNoExisteFichero(String filename) {
 
@@ -15,4 +15,5 @@ public class MensajeNoExisteFichero extends Mensaje {
     public String getFilename() {
         return _filename;
     }
+
 }

@@ -2,7 +2,7 @@ package com.p5_2;
 
 public class MensajeUsuarioRepetido extends Mensaje {
 
-    private String _username;
+    private final String _username; // nombre de usuario
 
     public MensajeUsuarioRepetido(String username) {
 
