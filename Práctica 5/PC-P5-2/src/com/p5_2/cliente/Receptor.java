@@ -47,6 +47,7 @@ public class Receptor extends Thread {
 
         // Obtener flujo de entrada para objetos
         ObjectInputStream objInStr;
+
         try {
             objInStr = new ObjectInputStream(inStr);
         } catch (IOException e) {
@@ -55,7 +56,32 @@ public class Receptor extends Thread {
             return;
         }
 
+        String filename;
+
+        try {
+            filename = (String)objInStr.readObject();
+        } catch (IOException e) {
+            System.err.println("ERROR: I/O error in stream");
+            _sem.release(); // release a semáforo
+            return;
+        } catch (ClassNotFoundException e) {
+            System.err.println("ERROR: (internal) wrong message class");
+            _sem.release(); // release a semáforo
+            return;
+        }
+
+        PrintWriter out;
+
+        try {
+            out = new PrintWriter(filename);
+        } catch (FileNotFoundException e) {
+            System.err.println("ERROR: error writing in filesystem");
+            _sem.release();
+            return;
+        }
+
         String file;
+
         try {
             file = (String)objInStr.readObject();
         } catch (IOException e) {
@@ -68,7 +94,9 @@ public class Receptor extends Thread {
             return;
         }
 
-        // TODO save String to file
+        out.print(file);
+
+        out.close();
 
         System.out.println(file);
 

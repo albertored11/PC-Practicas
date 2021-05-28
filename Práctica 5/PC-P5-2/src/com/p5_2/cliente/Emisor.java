@@ -61,6 +61,13 @@ public class Emisor extends Thread {
             return;
         }
 
+        try {
+            objOutStr.writeObject(_file.toString());
+        } catch (IOException e) {
+            System.err.println("ERROR: I/O error in stream");
+            return;
+        }
+
         // Leer del fichero
         File file = new File(_file.getFilepath());
 
@@ -82,8 +89,6 @@ public class Emisor extends Thread {
         }
 
         BufferedReader bufReader = new BufferedReader(fileReader);
-
-        // TODO ir enviando lineas?
 
         // Guardar el contenido del fichero en un String
         StringBuilder textBuilder = new StringBuilder();
