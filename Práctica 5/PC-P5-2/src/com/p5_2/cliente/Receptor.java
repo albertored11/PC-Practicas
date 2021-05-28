@@ -56,6 +56,7 @@ public class Receptor extends Thread {
             return;
         }
 
+        // Leer nombre de fichero del flujo
         String filename;
 
         try {
@@ -70,6 +71,7 @@ public class Receptor extends Thread {
             return;
         }
 
+        // Crear objeto para escribir en disco
         PrintWriter out;
 
         try {
@@ -80,6 +82,7 @@ public class Receptor extends Thread {
             return;
         }
 
+        // Leer contenido del fichero del flujo
         String file;
 
         try {
@@ -94,10 +97,11 @@ public class Receptor extends Thread {
             return;
         }
 
+        // Escribir en disco
         out.print(file);
-
         out.close();
 
+        // Escribir en stdout
         System.out.println(file);
 
         _sem.release(); // release a semáforo
