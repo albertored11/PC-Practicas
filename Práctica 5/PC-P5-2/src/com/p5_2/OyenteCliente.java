@@ -84,13 +84,13 @@ public class OyenteCliente extends Thread {
 
                         MensajePedirFichero mpf = (MensajePedirFichero)m;
 
-                        String file = mpf.getFile();
+                        String filename = mpf.getFile();
 
-                        Usuario user1 = _server.getFileUser(file);
+                        Fichero file = _server.getFileFromFilename(filename);
 
-                        if (user1 == null) {
+                        if (file == null) {
 
-                            MensajeNoExisteFichero mnef = new MensajeNoExisteFichero(file);
+                            MensajeNoExisteFichero mnef = new MensajeNoExisteFichero(filename);
 
                             objOutStr.writeObject(mnef);
 
@@ -98,7 +98,7 @@ public class OyenteCliente extends Thread {
 
                         }
 
-                        ObjectOutputStream objOutStr1 = _server.getObjectOutputStream(user1);
+                        ObjectOutputStream objOutStr1 = _server.getObjectOutputStream(file.getUser());
 
                         MensajeEmitirFichero mef = new MensajeEmitirFichero(file, mpf.getUser(), _server.getAndIncrementNextPort());
 

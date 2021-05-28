@@ -2,6 +2,8 @@ package com.p5_2;
 
 import java.io.*;
 import java.net.*;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.util.Enumeration;
 import java.util.Scanner;
 import java.util.concurrent.Semaphore;
@@ -130,7 +132,11 @@ public class ClienteApp {
 
         while (!filepath.isEmpty()) {
 
-            user.addFile(filepath);
+            Path path = Paths.get(filepath);
+
+            Fichero file = new Fichero(filepath, path.getFileName().toString(), user);
+
+            user.addFile(file);
 
             System.out.print("Path to file: ");
             filepath = in.nextLine();
@@ -217,13 +223,13 @@ public class ClienteApp {
                 case 2:
 
                     // Leer ruta del fichero que se quiere obtener
-                    System.out.print("Path to file: ");
-                    String file = in.nextLine();
+                    System.out.print("Filename: ");
+                    String filename = in.nextLine();
 
                     System.out.println();
 
                     // Mandar MENSAJE_PEDIR_FICHERO a OyenteCliente
-                    MensajePedirFichero mpf = new MensajePedirFichero(file, user);
+                    MensajePedirFichero mpf = new MensajePedirFichero(filename, user);
 
                     try {
                         objOutStr.writeObject(mpf);

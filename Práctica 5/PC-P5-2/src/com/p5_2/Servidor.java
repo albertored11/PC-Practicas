@@ -134,15 +134,15 @@ public class Servidor {
 
     }
 
-    public Usuario getFileUser(String filename) {
+    public Fichero getFileFromFilename(String filename) {
 
         _userListController.requestRead();
 
         for (Usuario user : _userList)
-            for (String file : user.getFileList())
-                if (file.equals(filename)) {
+            for (Fichero file : user.getFileList())
+                if (file.hasFilename(filename)) {
                     _userListController.releaseRead();
-                    return user;
+                    return file;
                 }
 
         _userListController.releaseRead();

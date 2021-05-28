@@ -1,9 +1,7 @@
 package com.p5_2;
 
-import java.io.InputStream;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
-import java.io.OutputStream;
 import java.util.List;
 import java.util.concurrent.Semaphore;
 
@@ -59,7 +57,7 @@ public class OyenteServidor extends Thread {
                             if (user.getFileList().isEmpty())
                                 System.out.println("    [no files]");
 
-                            for (String file : user.getFileList())
+                            for (Fichero file : user.getFileList())
                                 System.out.println("    " + file);
 
                             System.out.println();

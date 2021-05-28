@@ -6,10 +6,10 @@ import java.net.Socket;
 
 public class Emisor extends Thread {
 
-    private final String _file;
-    private final int _port;
+    private final Fichero _file; // fichero que se va a enviar
+    private final int _port; // puerto del socket que se establecerá entre emisor y receptor
 
-    public Emisor(String file, int port) {
+    public Emisor(Fichero file, int port) {
 
         _file = file;
         _port = port;
@@ -60,7 +60,7 @@ public class Emisor extends Thread {
         }
 
         // Leer del fichero
-        File file = new File(_file);
+        File file = new File(_file.getFilepath());
 
         FileReader fileReader;
 
