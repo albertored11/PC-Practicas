@@ -4,9 +4,7 @@ import com.p5_2.sync.ReadersWritersController;
 
 import java.io.IOException;
 import java.io.ObjectOutputStream;
-import java.net.InetAddress;
 import java.net.ServerSocket;
-import java.net.UnknownHostException;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -18,30 +16,20 @@ import static java.lang.System.exit;
 
 public class Servidor {
 
-    private final Map<Usuario, Stream> _userStreamMap;
-    private final List<Usuario> _userList;
-    private String _inetAddress;
-    private final int _port;
-    private ServerSocket _servSock;
-    private int _nextPort;
-    private final ReadersWritersController _userStreamMapController;
-    private final ReadersWritersController _userListController;
-    private final Lock _nextPortLock;
+    private final Map<Usuario, Stream> _userStreamMap; // mapa usuarios con object streams cliente-servidor
+    private final List<Usuario> _userList; // lista de usuarios
+    private ServerSocket _servSock; // server socket para aceptar conexiones entrantes
+    private int _nextPort; // puerto que se asignará a la siguiente comunicación P2P
+    private final ReadersWritersController _userStreamMapController; // monitor para controlar el acceso al mapa usuarios-streams
+    private final ReadersWritersController _userListController; // monitor para controlar el acceso a la lista de usuarios
+    private final Lock _nextPortLock; // lock para acceder a nextPort
 
     public Servidor(int port) {
 
         _userStreamMap = new HashMap<>();
         _userList = new ArrayList<>();
 
-        try {
-            _inetAddress = InetAddress.getLocalHost().toString();
-        } catch (UnknownHostException e) {
-            System.err.println("ERROR: unable to get localhost");
-            exit(1);
-        }
-
-        _port = port;
-
+        // Crear server socket
         try {
             _servSock = new ServerSocket(port);
         } catch (IOException e) {
@@ -49,6 +37,7 @@ public class Servidor {
             exit(1);
         }
 
+        // Asignar puertos para las comunicaciones P2P a partir del 30000 (hasta el 30999)
         _nextPort = 30000;
 
         _userStreamMapController = new ReadersWritersController();
@@ -58,10 +47,7 @@ public class Servidor {
 
     }
 
-    public Map<Usuario, Stream> getUserStreamMap() {
-        return _userStreamMap;
-    }
-
+    // Obtener flujo de salida para objetos para un usuario
     public ObjectOutputStream getObjectOutputStream(Usuario user) {
 
         _userStreamMapController.requestRead();
@@ -74,11 +60,13 @@ public class Servidor {
 
     }
 
+    // Obtener lista de usuarios
     public List<Usuario> getUserList() {
 
         _userListController.requestRead();
 
-        List<Usuario> ret = _userList;
+        // Crear nueva lista haciendo copia de la original para evitar accesos externos
+        List<Usuario> ret = new ArrayList<>(_userList);
 
         _userListController.releaseRead();
 
@@ -86,18 +74,12 @@ public class Servidor {
 
     }
 
-    public String getInetAddress() {
-        return _inetAddress;
-    }
-
-    public int getPort() {
-        return _port;
-    }
-
+    // Obtener server socket
     public ServerSocket getServSock() {
         return _servSock;
     }
 
+    // Añadir usuario y flujos para objetos al mapa
     public void putInUserStreamMap(Usuario user, Stream stream) {
 
         _userStreamMapController.requestWrite();
@@ -108,6 +90,7 @@ public class Servidor {
 
     }
 
+    // Añadir usuario a la lista
     public void addToUserList(Usuario user) {
 
         _userListController.requestWrite();
@@ -118,14 +101,17 @@ public class Servidor {
 
     }
 
+    // Eliminar usuario del mapa y de la lista
     public void removeFromUserLists(Usuario user) {
 
+        // Eliminar del mapa
         _userStreamMapController.requestWrite();
 
         _userStreamMap.remove(user);
 
         _userStreamMapController.releaseWrite();
 
+        // Eliminar de la lista
         _userListController.requestWrite();
 
         _userList.remove(user);
@@ -134,13 +120,14 @@ public class Servidor {
 
     }
 
+    // Obtener fichero a partir de un nombre de fichero
     public Fichero getFileFromFilename(String filename) {
 
         _userListController.requestRead();
 
         for (Usuario user : _userList)
             for (Fichero file : user.getFileList())
-                if (file.hasFilename(filename)) {
+                if (file.hasFilename(filename)) { // devuelve el primero que encuentre
                     _userListController.releaseRead();
                     return file;
                 }
@@ -151,7 +138,7 @@ public class Servidor {
 
     }
 
-    // Get original reference for a username; returns itself it not found
+    // Devuelve la referencia original de un usuario; devuelve la entrada si no lo encuentra
     public Usuario getOriginalUser(Usuario user) {
 
         _userListController.requestRead();
@@ -168,6 +155,7 @@ public class Servidor {
 
     }
 
+    // Método tipo "fetch-and-add" para obtener el puerto para la siguiente comunicación P2P e incrementarlo
     public int getAndIncrementNextPort() {
 
         _nextPortLock.lock();
@@ -175,12 +163,17 @@ public class Servidor {
         int ret = _nextPort;
         _nextPort++;
 
+        // Si se llega a 31000, volver a 30000
+        if (_nextPort == 31000)
+            _nextPort = 30000;
+
         _nextPortLock.unlock();
 
         return ret;
 
     }
 
+    // Comprobar si hay algún usuario registrado con un nombre
     public boolean hasUser(String username) {
 
         _userListController.requestRead();

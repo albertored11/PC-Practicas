@@ -72,6 +72,7 @@ public class Emisor extends Thread {
                 objOutStr.writeObject("ERROR: file " + _file + " not found\n");
             } catch (IOException ioException) {
                 System.err.println("ERROR: I/O error in stream");
+                return;
             }
 
             return;

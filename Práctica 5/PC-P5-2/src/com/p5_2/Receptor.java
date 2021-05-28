@@ -6,9 +6,9 @@ import java.util.concurrent.Semaphore;
 
 public class Receptor extends Thread {
 
-    private final Usuario _emisor;
-    private final int _port;
-    private final Semaphore _sem;
+    private final Usuario _emisor; // usuario emisor
+    private final int _port; // puerto del socket que se establecerá entre emisor y receptor
+    private final Semaphore _sem; // semáforo para controlar el flujo de stdout del cliente
 
     public Receptor(Usuario emisor, int port, Semaphore sem) {
 
@@ -21,23 +21,51 @@ public class Receptor extends Thread {
     @Override
     public void run() {
 
-        try { // TODO tratar excepciones
+        // Crear socket con receptor
+        Socket sock;
 
-            Socket sock = new Socket(_emisor.getInetAddress(), _port);
-
-            InputStream inStr = sock.getInputStream();
-            ObjectInputStream objInStr = new ObjectInputStream(inStr);
-
-            String file = (String)objInStr.readObject();
-
-            // TODO save String to file
-
-            System.out.println(file);
-
-            _sem.release();
-
+        try {
+            sock = new Socket(_emisor.getInetAddress(), _port);
+        } catch (IOException e) {
+            System.err.println("ERROR: server not found");
+            return;
         }
-        catch (Exception e) {}
+
+        // Obtener flujo de entrada
+        InputStream inStr;
+
+        try {
+            inStr = sock.getInputStream();
+        } catch (IOException e) {
+            System.err.println("ERROR: I/O error in socket");
+            return;
+        }
+
+        // Obtener flujo de entrada para objetos
+        ObjectInputStream objInStr;
+        try {
+            objInStr = new ObjectInputStream(inStr);
+        } catch (IOException e) {
+            System.err.println("ERROR: I/O error in stream");
+            return;
+        }
+
+        String file;
+        try {
+            file = (String)objInStr.readObject();
+        } catch (IOException e) {
+            System.err.println("ERROR: I/O error in stream");
+            return;
+        } catch (ClassNotFoundException e) {
+            System.err.println("ERROR: (internal) wrong message class");
+            return;
+        }
+
+        // TODO save String to file
+
+        System.out.println(file);
+
+        _sem.release(); // release a semáforo
 
     }
 

@@ -67,7 +67,7 @@ public class OyenteCliente extends Thread {
                             return;
                         }
 
-                        break;
+                        return;
 
                     }
 
@@ -178,7 +178,7 @@ public class OyenteCliente extends Thread {
 
                     MensajePreparadoClienteServidor mpcs = (MensajePreparadoClienteServidor)m;
 
-                    // Obtener usuario receptor
+                    // Obtener referencia original del usuario receptor (si no se hace, aparece una referencia nueva)
                     Usuario destUser = _server.getOriginalUser(mpcs.getDestUser());
 
                     // Mandar MENSAJE_PREPARADO_SERVIDORCLIENTE a OyenteServidor

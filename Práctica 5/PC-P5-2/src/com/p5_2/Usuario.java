@@ -6,14 +6,12 @@ import java.util.List;
 
 public class Usuario implements Serializable {
 
-//    private int _id;
-    private final String _name;
-    private final String _inetAddress;
-    private final ArrayList<Fichero> _fileList;
+    private final String _name; // nombre de usuario
+    private final String _inetAddress; // dirección IP
+    private final ArrayList<Fichero> _fileList; // lista de ficheros
 
-    Usuario(/*int id, */String name, String inetAddress) {
+    Usuario(String name, String inetAddress) {
 
-//        _id = id;
         _name = name;
         _inetAddress = inetAddress;
         _fileList = new ArrayList<>();
