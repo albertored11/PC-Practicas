@@ -1,6 +1,7 @@
 package com.p5_2;
 
 import java.io.*;
+import java.util.List;
 
 public class OyenteCliente extends Thread {
 
@@ -72,9 +73,11 @@ public class OyenteCliente extends Thread {
                     }
 
                     // Añadir usuario a las tablas del servidor
-                    _server.putInUserStreamMap(user, objOutStr);
+                    if (!_server.putInUserStreamMap(user, objOutStr))
+                        return;
 
-                    _server.addToUserList(user);
+                    if (!_server.addToUserList(user))
+                        return;
 
                     // Mandar MENSAJE_CONFIRMACION_CONEXION a OyenteServidor
                     Mensaje mcc = new MensajeConfirmacionConexion();
@@ -90,8 +93,13 @@ public class OyenteCliente extends Thread {
 
                 case "MENSAJE_LISTA_USUARIOS":
 
+                    List<Usuario> userList = _server.getUserList();
+
+                    if (userList == null)
+                        return;
+
                     // Mandar MENSAJE_CONFIRMACION_LISTA_USUARIOS a OyenteServidor
-                    Mensaje mclu = new MensajeConfirmacionListaUsuarios(_server.getUserList());
+                    Mensaje mclu = new MensajeConfirmacionListaUsuarios(userList);
 
                     // Si no hacemos un reset en el flujo de salida para objetos, obtendremos siempre la misma lista
                     try {
@@ -115,7 +123,8 @@ public class OyenteCliente extends Thread {
                     MensajeCerrarConexion mcco = (MensajeCerrarConexion)m;
 
                     // Eliminar al usuario de las tablas del servidor
-                    _server.removeFromUserLists(mcco.getUser());
+                    if (!_server.removeFromUserLists(mcco.getUser()))
+                        return;
 
                     // Mandar MENSAJE_CONFIRMACION_CERRAR_CONEXION a OyenteServidor
                     Mensaje mccc = new MensajeConfirmacionCerrarConexion();
@@ -156,6 +165,9 @@ public class OyenteCliente extends Thread {
                     // Mandar MENSAJE_EMITIR_FICHERO a OyenteServidor
                     ObjectOutputStream objOutStr1 = _server.getObjectOutputStream(file.getUser());
 
+                    if (objOutStr1 == null)
+                        return;
+
                     MensajeEmitirFichero mef = new MensajeEmitirFichero(file, mpf.getUser(), _server.getAndIncrementNextPort());
 
                     try {
@@ -179,8 +191,14 @@ public class OyenteCliente extends Thread {
                     // Obtener referencia original del usuario receptor (si no se hace, aparece una referencia nueva)
                     Usuario destUser = _server.getOriginalUser(mpcs.getDestUser());
 
+                    if (destUser == null)
+                        return;
+
                     // Mandar MENSAJE_PREPARADO_SERVIDORCLIENTE a OyenteServidor
                     ObjectOutputStream objOutStr2 = _server.getObjectOutputStream(destUser);
+
+                    if (objOutStr2 == null)
+                        return;
 
                     Mensaje mpsc = new MensajePreparadoServidorCliente(user, mpcs.getPort());
 

@@ -50,7 +50,8 @@ public class Servidor {
     // Obtener flujo de salida para objetos para un usuario
     public ObjectOutputStream getObjectOutputStream(Usuario user) {
 
-        _userStreamMapController.requestRead();
+        if (!_userStreamMapController.requestRead())
+            return null;
 
         ObjectOutputStream ret = _userStreamMap.get(user);
 
@@ -63,7 +64,8 @@ public class Servidor {
     // Obtener lista de usuarios
     public List<Usuario> getUserList() {
 
-        _userListController.requestRead();
+        if (!_userListController.requestRead())
+            return null;
 
         // Crear nueva lista haciendo copia de la original para evitar accesos externos
         List<Usuario> ret = new ArrayList<>(_userList);
@@ -80,50 +82,61 @@ public class Servidor {
     }
 
     // Añadir usuario y flujos para objetos al mapa
-    public void putInUserStreamMap(Usuario user, ObjectOutputStream stream) {
+    public boolean putInUserStreamMap(Usuario user, ObjectOutputStream stream) {
 
-        _userStreamMapController.requestWrite();
+        if (!_userStreamMapController.requestWrite())
+            return false;
 
         _userStreamMap.put(user, stream);
 
         _userStreamMapController.releaseWrite();
 
+        return true;
+
     }
 
     // Añadir usuario a la lista
-    public void addToUserList(Usuario user) {
+    public boolean addToUserList(Usuario user) {
 
-        _userListController.requestWrite();
+        if (!_userListController.requestWrite())
+            return false;
 
         _userList.add(user);
 
         _userListController.releaseWrite();
 
+        return true;
+
     }
 
     // Eliminar usuario del mapa y de la lista
-    public void removeFromUserLists(Usuario user) {
+    public boolean removeFromUserLists(Usuario user) {
 
         // Eliminar del mapa
-        _userStreamMapController.requestWrite();
+        if (!_userStreamMapController.requestWrite())
+            return false;
 
         _userStreamMap.remove(user);
 
         _userStreamMapController.releaseWrite();
 
         // Eliminar de la lista
-        _userListController.requestWrite();
+        if (!_userListController.requestWrite())
+            return false;
 
         _userList.remove(user);
 
         _userListController.releaseWrite();
+
+        return true;
 
     }
 
     // Obtener fichero a partir de un nombre de fichero
     public Fichero getFileFromFilename(String filename) {
 
-        _userListController.requestRead();
+        if (!_userListController.requestRead())
+            return null;
 
         for (Usuario user : _userList)
             for (Fichero file : user.getFileList())
@@ -141,7 +154,8 @@ public class Servidor {
     // Devuelve la referencia original de un usuario; devuelve la entrada si no lo encuentra
     public Usuario getOriginalUser(Usuario user) {
 
-        _userListController.requestRead();
+        if (!_userListController.requestRead())
+            return null;
 
         for (Usuario u : _userList)
             if (u.toString().equals(user.toString())) {
@@ -176,7 +190,8 @@ public class Servidor {
     // Comprobar si hay algún usuario registrado con un nombre
     public boolean hasUser(String username) {
 
-        _userListController.requestRead();
+        if (!_userListController.requestRead())
+            return true;
 
         for (Usuario u : _userList)
             if (u.toString().equals(username)) {

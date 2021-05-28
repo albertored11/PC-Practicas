@@ -4,13 +4,14 @@ import java.util.concurrent.locks.Condition;
 import java.util.concurrent.locks.Lock;
 import java.util.concurrent.locks.ReentrantLock;
 
+// Monitor readers/writers implementado con lock & conditions
 public class ReadersWritersController {
 
-    private int _numReaders;
-    private int _numWriters;
-    private final Lock _lock;
-    private final Condition _okToRead;
-    private final Condition _okToWrite;
+    private int _numReaders; // número actual de lectores
+    private int _numWriters; // número actual de escritores
+    private final Lock _lock; // lock para garantizar que los métodos del monitor se ejecutan en exclusión mutua
+    private final Condition _okToRead; // variable condicional para indicar que se puede leer
+    private final Condition _okToWrite; // variable condicional para indicar que se puede escribir
 
     public ReadersWritersController() {
 
@@ -22,22 +23,30 @@ public class ReadersWritersController {
 
     }
 
-    public void requestRead() {
+    public boolean requestRead() {
 
         _lock.lock();
 
+        // Si hay writers, esperar a que nos digan que se puede leer
         while (_numWriters > 0) {
             try {
                 _okToRead.await();
             }
             catch (InterruptedException e) {
-                e.printStackTrace();
+
+                System.err.println("ERROR: interrupted thread");
+                _lock.unlock();
+
+                return false;
+
             }
         }
 
         _numReaders++;
 
         _lock.unlock();
+
+        return true;
 
     }
 
@@ -47,6 +56,7 @@ public class ReadersWritersController {
 
         _numReaders--;
 
+        // Si no quedan readers, indicar que se puede escribir
         if (_numReaders == 0)
             _okToWrite.signal();
 
@@ -54,22 +64,30 @@ public class ReadersWritersController {
 
     }
 
-    public void requestWrite() {
+    public boolean requestWrite() {
 
         _lock.lock();
 
+        // Si hay readers o writers, esperar a que nos digan que se puede escribir
         while (_numReaders > 0 || _numWriters > 0) {
             try {
                 _okToWrite.await();
             }
             catch (InterruptedException e) {
-                e.printStackTrace();
+
+                System.err.println("ERROR: interrupted thread");
+                _lock.unlock();
+
+                return false;
+
             }
         }
 
         _numWriters++;
 
         _lock.unlock();
+
+        return true;
 
     }
 
@@ -79,6 +97,7 @@ public class ReadersWritersController {
 
         _numWriters--;
 
+        // Indicar que se puede leer y escribir
         _okToWrite.signal();
         _okToRead.signalAll();
 
