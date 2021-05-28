@@ -1,4 +1,4 @@
-package com.p5_2.sync;
+package com.p5_2.monitor;
 
 import java.util.concurrent.locks.Condition;
 import java.util.concurrent.locks.Lock;

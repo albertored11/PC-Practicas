@@ -1,6 +1,8 @@
-package com.p5_2;
+package com.p5_2.servidor;
 
-import com.p5_2.sync.ReadersWritersController;
+import com.p5_2.monitor.ReadersWritersController;
+import com.p5_2.usuario.Fichero;
+import com.p5_2.usuario.Usuario;
 
 import java.io.IOException;
 import java.io.ObjectOutputStream;

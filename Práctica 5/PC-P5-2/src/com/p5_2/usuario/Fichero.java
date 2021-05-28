@@ -1,4 +1,4 @@
-package com.p5_2;
+package com.p5_2.usuario;
 
 import java.io.Serializable;
 

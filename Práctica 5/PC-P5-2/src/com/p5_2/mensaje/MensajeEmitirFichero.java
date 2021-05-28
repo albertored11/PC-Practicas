@@ -1,4 +1,7 @@
-package com.p5_2;
+package com.p5_2.mensaje;
+
+import com.p5_2.usuario.Fichero;
+import com.p5_2.usuario.Usuario;
 
 public class MensajeEmitirFichero extends Mensaje {
 

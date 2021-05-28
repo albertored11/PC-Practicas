@@ -1,4 +1,4 @@
-package com.p5_2;
+package com.p5_2.servidor;
 
 import java.io.IOException;
 import java.io.InputStream;

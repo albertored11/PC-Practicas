@@ -1,4 +1,6 @@
-package com.p5_2;
+package com.p5_2.cliente;
+
+import com.p5_2.usuario.Fichero;
 
 import java.io.*;
 import java.net.ServerSocket;

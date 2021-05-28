@@ -1,4 +1,4 @@
-package com.p5_2;
+package com.p5_2.mensaje;
 
 public class MensajeNoExisteFichero extends Mensaje {
 
