@@ -21,6 +21,7 @@ public class Emisor extends Thread {
     @Override
     public void run() {
 
+        // Crear server socket
         ServerSocket servSock;
 
         try {
@@ -30,6 +31,7 @@ public class Emisor extends Thread {
             return;
         }
 
+        // Esperar a que se conecte el receptor y obtener socket
         Socket sock;
 
         try {
@@ -39,6 +41,7 @@ public class Emisor extends Thread {
             return;
         }
 
+        // Obtener flujo de salida
         OutputStream outStr;
 
         try {
@@ -48,6 +51,7 @@ public class Emisor extends Thread {
             return;
         }
 
+        // Obtener flujo de salida para objetos
         ObjectOutputStream objOutStr;
 
         try {
@@ -57,6 +61,7 @@ public class Emisor extends Thread {
             return;
         }
 
+        // Leer del fichero
         File file = new File(_file);
 
         FileReader fileReader;
@@ -70,6 +75,9 @@ public class Emisor extends Thread {
 
         BufferedReader bufReader = new BufferedReader(fileReader);
 
+        // TODO ir enviando lineas?
+
+        // Guardar el contenido del fichero en un String
         StringBuilder textBuilder = new StringBuilder();
 
         String text;
@@ -95,6 +103,7 @@ public class Emisor extends Thread {
 
         }
 
+        // Enviar el String al receptor
         try {
             objOutStr.writeObject(textBuilder.toString());
         } catch (IOException e) {
