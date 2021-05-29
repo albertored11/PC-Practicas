@@ -30,6 +30,7 @@ public class Receptor extends Thread {
             sock = new Socket(_emisor.getInetAddress(), _port);
         } catch (IOException e) {
             System.err.println("ERROR: server not found");
+            System.out.println();
             _sem.release(); // release a semáforo
             return;
         }
@@ -41,6 +42,7 @@ public class Receptor extends Thread {
             inStr = sock.getInputStream();
         } catch (IOException e) {
             System.err.println("ERROR: I/O error in socket");
+            System.out.println();
             _sem.release(); // release a semáforo
             return;
         }
@@ -52,6 +54,32 @@ public class Receptor extends Thread {
             objInStr = new ObjectInputStream(inStr);
         } catch (IOException e) {
             System.err.println("ERROR: I/O error in stream");
+            System.out.println();
+            _sem.release(); // release a semáforo
+            return;
+        }
+
+        // Leer si el fichero se ha encontrado
+        String fileFound;
+
+        try {
+
+            fileFound = (String)objInStr.readObject();
+
+            if (!fileFound.equals("OK")) {
+                System.out.println(fileFound);
+                _sem.release();
+                return;
+            }
+
+        } catch (IOException e) {
+            System.err.println("ERROR: I/O error in stream");
+            System.out.println();
+            _sem.release(); // release a semáforo
+            return;
+        } catch (ClassNotFoundException e) {
+            System.err.println("ERROR: (internal) wrong message class");
+            System.out.println();
             _sem.release(); // release a semáforo
             return;
         }
@@ -63,43 +91,76 @@ public class Receptor extends Thread {
             filename = (String)objInStr.readObject();
         } catch (IOException e) {
             System.err.println("ERROR: I/O error in stream");
+            System.out.println();
             _sem.release(); // release a semáforo
             return;
         } catch (ClassNotFoundException e) {
             System.err.println("ERROR: (internal) wrong message class");
+            System.out.println();
             _sem.release(); // release a semáforo
             return;
         }
 
-        // Crear objeto para escribir en disco
-        PrintWriter out;
+        // Crear flujo de salida para escribir en el fichero
+        FileOutputStream fileOutStr;
 
         try {
-            out = new PrintWriter(filename);
+            fileOutStr = new FileOutputStream(filename);
         } catch (FileNotFoundException e) {
             System.err.println("ERROR: error writing in filesystem");
+            System.out.println();
             _sem.release();
             return;
         }
 
-        // Leer contenido del fichero del flujo
-        String file;
+        // Crear flujo de entrada de datos para recibir los bytes del fichero
+        DataInputStream dataInStr = new DataInputStream(new BufferedInputStream(inStr));
+
+        byte[] byteBuffer = new byte[1024]; // buffer de bytes
+        int read;
+
+        while (true) {
+
+            // Leer bytes del flujo de entrada de datos y guardarlos en el buffer
+            try {
+                if ((read = dataInStr.read(byteBuffer)) < 0)
+                    break;
+            } catch (IOException e) {
+                System.err.println("ERROR: I/O error in file stream");
+                System.out.println();
+                _sem.release();
+                return;
+            }
+
+            // Leer bytes del buffer y escribirlos en el fichero
+            try {
+                fileOutStr.write(byteBuffer, 0, read);
+            } catch (IOException e) {
+                System.err.println("ERROR: I/O error in data stream");
+                System.out.println();
+                _sem.release();
+                return;
+            }
+
+        }
 
         try {
-            file = (String)objInStr.readObject();
+            dataInStr.close();
         } catch (IOException e) {
-            System.err.println("ERROR: I/O error in stream");
-            _sem.release(); // release a semáforo
-            return;
-        } catch (ClassNotFoundException e) {
-            System.err.println("ERROR: (internal) wrong message class");
-            _sem.release(); // release a semáforo
+            System.err.println("ERROR: I/O error in data stream");
+            System.out.println();
+            _sem.release();
             return;
         }
 
-        // Escribir en disco
-        out.print(file);
-        out.close();
+        try {
+            fileOutStr.close();
+        } catch (IOException e) {
+            System.err.println("ERROR: I/O error in file stream");
+            System.out.println();
+            _sem.release();
+            return;
+        }
 
         System.out.println("File saved to " + System.getProperty("user.dir") + "/" + filename);
         System.out.println();

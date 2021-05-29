@@ -61,20 +61,11 @@ public class Emisor extends Thread {
             return;
         }
 
-        try {
-            objOutStr.writeObject(_file.toString());
-        } catch (IOException e) {
-            System.err.println("ERROR: I/O error in stream");
-            return;
-        }
-
-        // Leer del fichero
-        File file = new File(_file.getFilepath());
-
-        FileReader fileReader;
+        // Crear flujo de entrada para leer el fichero
+        FileInputStream fileInStr;
 
         try {
-            fileReader = new FileReader(file);
+            fileInStr = new FileInputStream(_file.getFilepath());
         } catch (FileNotFoundException e) {
 
             try {
@@ -88,46 +79,60 @@ public class Emisor extends Thread {
 
         }
 
-        BufferedReader bufReader = new BufferedReader(fileReader);
-
-        // Guardar el contenido del fichero en un String
-        StringBuilder textBuilder = new StringBuilder();
-
-        String text;
-
+        // Enviar que el fichero se ha encontrado
         try {
-            text = bufReader.readLine();
+            objOutStr.writeObject("OK");
         } catch (IOException e) {
-            System.err.println("ERROR: I/O error in buffer");
+            System.err.println("ERROR: I/O error in stream");
             return;
         }
 
-        while (text != null) {
+        // Enviar nombre del fichero
+        try {
+            objOutStr.writeObject(_file.toString());
+        } catch (IOException e) {
+            System.err.println("ERROR: I/O error in stream");
+            return;
+        }
 
-            textBuilder.append(text);
-            textBuilder.append('\n');
+        // Crear flujo de salida de datos para enviar los bytes del fichero
+        DataOutputStream dataOutStr = new DataOutputStream(new BufferedOutputStream(outStr));
 
+        byte[] byteBuffer = new byte[1024]; // buffer de bytes
+        int read;
+
+        while (true) {
+
+            // Leer bytes del fichero y guardarlos en el buffer
             try {
-                text = bufReader.readLine();
+                if ((read = fileInStr.read(byteBuffer)) < 0)
+                    break;
             } catch (IOException e) {
-
-                try {
-                    objOutStr.writeObject("ERROR: I/O error in buffer\n");
-                } catch (IOException ioException) {
-                    System.err.println("ERROR: I/O error in stream");
-                }
-
+                System.err.println("ERROR: I/O error in file stream");
                 return;
+            }
 
+            // Leer bytes del buffer y escribirlos en el flujo de salida de datos
+            try {
+                dataOutStr.write(byteBuffer, 0, read);
+            } catch (IOException e) {
+                System.err.println("ERROR: I/O error in data stream");
+                return;
             }
 
         }
 
-        // Enviar el String al receptor
         try {
-            objOutStr.writeObject(textBuilder.toString());
+            dataOutStr.close();
         } catch (IOException e) {
-            System.err.println("ERROR: I/O error in stream");
+            System.err.println("ERROR: I/O error in data stream");
+            return;
+        }
+
+        try {
+            fileInStr.close();
+        } catch (IOException e) {
+            System.err.println("ERROR: I/O error in file stream");
         }
 
     }

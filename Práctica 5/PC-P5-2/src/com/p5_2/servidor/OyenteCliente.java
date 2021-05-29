@@ -140,6 +140,8 @@ public class OyenteCliente extends Thread {
                         return;
                     }
 
+                    System.out.println("Client from " + mcco.getUser().getInetAddress() + " disconnected");
+
                     return;
 
                 case "MENSAJE_PEDIR_FICHERO":
