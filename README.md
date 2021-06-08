@@ -17,5 +17,3 @@ El enunciado de las prácticas no se incluye; en su lugar, para cada una hay un 
 - [Práctica 3: Semáforos](/Práctica%203)
 - [Práctica 4: Monitores](/Práctica%204)
 - [Práctica 5: Programación distribuida y concurrente y sockets](/Práctica%205)
-
-**TODO:** mover el proyecto a otro repositorio para eliminar los commits previos y evitar que se puedan recuperar los ficheros PDF con los enunciados de las prácticas.
